@@ -1,0 +1,22 @@
+{
+  "name": "liiga_veikkaus",
+  "version": "1.0.0",
+  "description": "Runkosarja veikkauksen laskeminen",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohSjovall/Liiga_veikkaus.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JohSjovall/Liiga_veikkaus/issues"
+  },
+  "homepage": "https://github.com/JohSjovall/Liiga_veikkaus#readme",
+  "dependencies": {
+    "express": "^4.15.4"
+  }
+}
