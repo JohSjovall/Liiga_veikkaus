@@ -1,1 +1,3 @@
-# Liiga_veikkaus
+# Liiga Veikkaus
+
+Runkosarja veikkauksen laskeminen
