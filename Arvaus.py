@@ -12,28 +12,28 @@ c2 = conn2.cursor()
 tilanne = []
 
 def create_gamers_list():
-    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJAT(PLAYER_ID INT NOT NULL, GAME_ID INT NOT NULL, NAME TEXT NOT NULL, MAIL TEXT)")
+    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJAT(PLAYER_ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL, MAIL TEXT)")
 def create_games_list():
-    c2.execute("CREATE TABLE IF NOT EXISTS PELIT(GAME_ID INT NOT NULL, NAME TEXT NOT NULL)")
+    c2.execute("CREATE TABLE IF NOT EXISTS PELIT(GAME_ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL)")
 def create_players_guess(): #name on PLAYER_ID numero
-    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJIEN_ARVAUKSET(PLAYER_ID INT NOT NULL, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL)")
+    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJIEN_ARVAUKSET(PLAYER_ID REFERENCES PELAAJAT(PLAYER_ID) ON UPDATE CASCADE ON DELETE CASCADE, GAME_ID REFERENCES PELIT(GAME_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, CONSTRAINT PG_PK PRIMARY KEY(PLAYER_ID, GAME_ID))")
 def create_players_points ():
-    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJIEN_PISTEET(PLAYER_ID INT NOT NULL, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, KOKONAISPISTEET INT, datestamp TEXT)")
+    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJIEN_PISTEET(DAY_ID DATE NOT NULL, PLAYER_ID REFERENCES PELAAJAT(PLAYER_ID) ON UPDATE CASCADE ON DELETE CASCADE , GAME_ID REFERENCES PELIT(GAME_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, KOKONAISPISTEET INT, CONSTRAINT DPG_PK PRIMARY KEY(DAY_ID, PLAYER_ID, GAME_ID))")
 def update_player_points (name, data, day):
-    c2.execute("INSERT INTO PELAAJIEN_PISTEET(PLAYER_ID, HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT , KOKONAISPISTEET, datestamp) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (name, data[0] , data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7] , data[8] , data[9] , data[10] , data[11] , data[12] , data[13] , data[14] , data[15] , day))
-    conn2.commit()
-    print("PLAYER: ",name," POINTS ARE UPDATED ",day)
+    try:
+        c2.execute("INSERT INTO PELAAJIEN_PISTEET(PLAYER_ID, GAME_ID, HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT , KOKONAISPISTEET, DAY_ID) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(name[0]), int(name[1]), data[0] , data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7] , data[8] , data[9] , data[10] , data[11] , data[12] , data[13] , data[14] , data[15] , day))
+        conn2.commit()
+        print("PLAYER: ",name[0]," GAME: ",name[1]," POINTS ARE UPDATED ",day)
+    except:
+        print("NO UPDATED! PLAYER: ",name[0]," GAME: ",name[1]," POINTS HAS UPDATED ",day)
 def make_points ():
-    day = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    c.execute("SELECT HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT FROM LIIGATILANNE")
+    day = datetime.date.today()
+    c.execute("SELECT HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT FROM LIIGATILANNE WHERE DAY_ID = (SELECT MAX(DAY_ID) FROM LIIGATILANNE)")
     tilanne = c.fetchall()
-    viimeinen = tilanne[len(tilanne)-1]
-    c2.execute("SELECT PLAYER_ID FROM PELAAJAT")
+    c2.execute("SELECT HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT, PLAYER_ID, GAME_ID FROM PELAAJIEN_ARVAUKSET")
     pelaajat = c2.fetchall()
-    for row in pelaajat:
-        c2.execute("SELECT HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT FROM PELAAJIEN_ARVAUKSET WHERE PLAYER_ID = "+str(row[0]))
-        arvaukset = c2.fetchall()
-        update_player_points(int(row[0]), laskenta(viimeinen, arvaukset[0]), day)
+    for row in range(len(pelaajat)):
+        update_player_points(pelaajat[row][15:17], laskenta(tilanne[0], pelaajat[row][0:15]), day)
 def laskenta (tilanne, arvaus):
     kuusioikein = 0
     taulukko = []
@@ -66,37 +66,37 @@ def laskenta (tilanne, arvaus):
         total = total + 1
     taulukko.append(total)
     return taulukko
-#def make_player ():
-#    Player_ID = 2
-#    Game_ID = 1
-#    name = "Tiina"
-#    data = [10,2,3,4,6,7,5,8,12,11,9,13,15,14,1]
-#    c2.execute("INSERT INTO PELIT(GAME_ID, NAME) VALUES (1,'Testi')")
-#    conn2.commit()
-#    c2.execute("INSERT INTO PELAAJAT(PLAYER_ID, GAME_ID, NAME) VALUES (?,?,?)", (Player_ID, Game_ID, name))
-#    conn2.commit()
-#    c2.execute("INSERT INTO PELAAJIEN_ARVAUKSET(PLAYER_ID, HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (Player_ID, data[0] , data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7] , data[8] , data[9] , data[10] , data[11] , data[12] , data[13] , data[14]))
-#    conn2.commit()
+def make_player ():
+    Player_ID = 1
+    Game_ID = 1
+    name = "Tiina"
+    data = [10,2,3,4,6,7,5,8,12,11,9,13,15,14,1]
+    c2.execute("INSERT INTO PELIT(NAME) VALUES (?)",("Testi",))
+    conn2.commit()
+    c2.execute("INSERT INTO PELAAJAT(NAME) VALUES (?)",(name,))
+    conn2.commit()
+    c2.execute("INSERT INTO PELAAJIEN_ARVAUKSET(PLAYER_ID, GAME_ID, HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (Player_ID, Game_ID, data[0] , data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7] , data[8] , data[9] , data[10] , data[11] , data[12] , data[13] , data[14]))
+    conn2.commit()
 def create_table():
-    c.execute("CREATE TABLE IF NOT EXISTS LIIGATILANNE(datestamp TEXT, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
+    c.execute("CREATE TABLE IF NOT EXISTS LIIGATILANNE(DAY_ID DATE, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
 def liiga_data(day, data):
     c.execute("INSERT INTO LIIGATILANNE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
     conn.commit()
 def joukkue_tabel(data):
-    c.execute("CREATE TABLE IF NOT EXISTS "+ data + "(datestamp TEXT, OTTELUT INT, VOITOT INT, TASAPELIT INT, LISA_PISTE INT, TEHDYT_MAALIT INT, PAASTETYT_MAALIT INT, PISTEET INT)")
+    c.execute("CREATE TABLE IF NOT EXISTS "+ data + "(DAY_ID DATE, OTTELUT INTEGER PRIMARY KEY, VOITOT INT, TASAPELIT INT, LISA_PISTE INT, TEHDYT_MAALIT INT, PAASTETYT_MAALIT INT, PISTEET INT)")
 def joukkue_data(day, data):
-    c.execute("INSERT INTO "+data[0]+"(datestamp , OTTELUT, VOITOT, TASAPELIT, LISA_PISTE, TEHDYT_MAALIT, PAASTETYT_MAALIT, PISTEET) VALUES ( ?,?,?,?,?,?,?,?)", (day, data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7]))
+    c.execute("INSERT INTO "+data[0]+"(DAY_ID , OTTELUT, VOITOT, TASAPELIT, LISA_PISTE, TEHDYT_MAALIT, PAASTETYT_MAALIT, PISTEET) VALUES ( ?,?,?,?,?,?,?,?)", (day, data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7]))
     conn.commit()
 def joukkue_OTTELU_chek(data):
     update = False
     for x in range(len(data)):
         joukkue_tabel(str(data[x][0]))
-        c.execute("SELECT OTTELUT FROM "+str(data[x][0])+"")
-        joukkue_data = c.fetchall()
-        if (len(joukkue_data)-1) >= 0:
-            #print("Kannasta: ",joukkue_data[len(joukkue_data)-1][0])
+        c.execute("SELECT OTTELUT FROM "+str(data[x][0])+" WHERE DAY_ID = (SELECT MAX(DAY_ID) FROM LIIGATILANNE)")
+        joukkue_data = c.fetchone()
+        if len(joukkue_data) > 0:
+            #print("Kannasta: ",joukkue_data[0])
             #print("verkosta: ",data[x][1])
-            if joukkue_data[len(joukkue_data)-1][0] == data[x][1]:
+            if joukkue_data[0] == data[x][1]:
                 pass
                 #print('sama') 
             else:
@@ -113,14 +113,19 @@ def joukkue_OTTELU_chek(data):
         print("NO UPDATE: "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
         pass
 def joukkue_data_updaet():
-    TIME = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    data = "datestamp "
+    TIME = datetime.date.today()
+    data = "DAY_ID"
     for x in range(len(tilanne)):
         data = data+", "+tilanne[x][0]
-        joukkue_data(TIME, tilanne[x])
+        try:
+            joukkue_data(TIME, tilanne[x])
+            print("UPDATE TEAM: ",tilanne[x][0])
+        except:
+            #print("NO UPDATE TEAM: ",tilanne[x][0])
+            pass
     liiga_data(TIME, data)
     make_points()
-    print("UPDATE DONE: "+TIME)   
+    print("UPDATE DONE: "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))   
 class MyHTMLParser(HTMLParser):
     def handle_data(self, data):
         joukkueet = ["Lukko","K\\xc3\\xa4rp\\xc3\\xa4t","TPS","Tappara","Sport","Pelicans","KalPa","\\xc3\\x84ss\\xc3\\xa4t","KooKoo","SaiPa","HIFK","HPK","Ilves","Jukurit","JYP"]
@@ -141,6 +146,11 @@ class MyHTMLParser(HTMLParser):
                 pass
 counter = 0
 play = True
+create_gamers_list()
+create_games_list()
+create_players_guess()
+create_players_points()
+#make_player()
 while play:
     try:
         response = urllib.request.urlopen('http://liiga.fi/sarjataulukko')
@@ -150,9 +160,9 @@ while play:
         print("ERROR! NO CONNECT: "+datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
     create_table()
     joukkue_OTTELU_chek(tilanne)
-    tilanne.clear()  
+    tilanne.clear()
     time.sleep(15)
-c2.close()    
+c2.close()
 c.close()
 conn.close()
 conn2.close()
