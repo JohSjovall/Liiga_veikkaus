@@ -12,9 +12,9 @@ c2 = conn2.cursor()
 tilanne = []
 
 def create_gamers_list():
-    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJAT(PLAYER_ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL, MAIL TEXT)")
+    c2.execute("CREATE TABLE IF NOT EXISTS PELAAJAT(PLAYER_ID INTEGER PRIMARY KEY, FIRST_NAME TEXT NOT NULL, LAST_NAME TEXT NOT NULL, MAIL TEXT)")
 def create_games_list():
-    c2.execute("CREATE TABLE IF NOT EXISTS PELIT(GAME_ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL)")
+    c2.execute("CREATE TABLE IF NOT EXISTS PELIT(GAME_ID INTEGER PRIMARY KEY, NAME TEXT NOT NULL UNIQUE)")
 def create_players_guess(): #name on PLAYER_ID numero
     c2.execute("CREATE TABLE IF NOT EXISTS PELAAJIEN_ARVAUKSET(PLAYER_ID REFERENCES PELAAJAT(PLAYER_ID) ON UPDATE CASCADE ON DELETE CASCADE, GAME_ID REFERENCES PELIT(GAME_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, CONSTRAINT PG_PK PRIMARY KEY(PLAYER_ID, GAME_ID))")
 def create_players_points ():
@@ -69,11 +69,12 @@ def laskenta (tilanne, arvaus):
 def make_player ():
     Player_ID = 1
     Game_ID = 1
-    name = "Tiina"
+    Fname = "Tiina"
+    Lname = "Kokeilu"
     data = [10,2,3,4,6,7,5,8,12,11,9,13,15,14,1]
     c2.execute("INSERT INTO PELIT(NAME) VALUES (?)",("Testi",))
     conn2.commit()
-    c2.execute("INSERT INTO PELAAJAT(NAME) VALUES (?)",(name,))
+    c2.execute("INSERT INTO PELAAJAT(FIRST_NAME, LAST_NAME) VALUES (?,?)",(Fname,Lname))
     conn2.commit()
     c2.execute("INSERT INTO PELAAJIEN_ARVAUKSET(PLAYER_ID, GAME_ID, HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (Player_ID, Game_ID, data[0] , data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7] , data[8] , data[9] , data[10] , data[11] , data[12] , data[13] , data[14]))
     conn2.commit()
@@ -91,9 +92,9 @@ def joukkue_OTTELU_chek(data):
     update = False
     for x in range(len(data)):
         joukkue_tabel(str(data[x][0]))
-        c.execute("SELECT OTTELUT FROM "+str(data[x][0])+" WHERE DAY_ID = (SELECT MAX(DAY_ID) FROM LIIGATILANNE)")
+        c.execute("SELECT MAX(OTTELUT) FROM "+str(data[x][0]))
         joukkue_data = c.fetchone()
-        if len(joukkue_data) > 0:
+        if joukkue_data is not None:
             #print("Kannasta: ",joukkue_data[0])
             #print("verkosta: ",data[x][1])
             if joukkue_data[0] == data[x][1]:
