@@ -126,4 +126,4 @@ def make_Message():
 #print(make_Player_statistics(1,1))
 #print(make_Player_list())
 #print(make_Player_point(1,1))
-make_Message()
+#make_Message()
