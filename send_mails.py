@@ -2,7 +2,7 @@ import smtplib
 import sqlite3
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import config
+import configure
 
 conn = sqlite3.connect('LiigaData.db')
 c = conn.cursor()
@@ -11,8 +11,8 @@ c2 = conn2.cursor()
 teams = ['HPK', 'HIFK', 'ILVES', 'JUKURIT', 'JYP', 'KALPA', 'KOOKOO', 'KARPAT', 'LUKKO', 'PELICANS', 'SAIPA', 'SPORT', 'TAPPARA', 'TPS', 'ASSAT']
 def send_mail(to, subject, html):    
     try:
-        me = config.USER
-        setup = config.SETUP
+        me = configure.USER
+        setup = configure.SETUP
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = me

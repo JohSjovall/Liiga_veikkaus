@@ -107,7 +107,7 @@ def joukkue_OTTELU_chek(data):
         joukkue_tabel(str(data[x][0]))
         c.execute("SELECT MAX(OTTELUT) FROM "+str(data[x][0]))
         joukkue_data = c.fetchone()
-        if joukkue_data is not None:
+        if joukkue_data is not None and joukkue_data[0] == data[x][1]:
             #print("Kannasta: ",joukkue_data[0])
             #print("verkosta: ",data[x][1])
             if joukkue_data[0] == data[x][1]:
