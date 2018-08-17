@@ -1,5 +1,6 @@
 import csv
 import sqlite3
+import configure_player as con_player
 
 conn = sqlite3.connect('Database_liiga_game.db')
 c = conn.cursor()
@@ -61,6 +62,9 @@ def read_csv_dokument(dokument_name):
                 for x in range(5,20):
                     guesses += ","+line[x]
                 maxPID = make_player_and_guess(maxPID, maxGID, guesses, line[3:5],mail)
+        print("---------------------------------------------")
+        con_player.create_games_tables()
+        con_player.make_updates()
         print("---------------------------------------------")
     else:
         print("GAME NAME IS ON USE!")

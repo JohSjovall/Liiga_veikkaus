@@ -54,6 +54,9 @@ def make_players_points():
             if player[x] <= 10 and league_table[x] <= 10:
                 total_points += 1
                 points += 1
+            if (player[x] == 1 and league_table[x] == 1) or (player[x] == 15 and league_table[x] == 15):
+                total_points += 1
+                points += 1
             player_points.append(points)
             points = 0
         if correct_counter >= 6:

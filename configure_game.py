@@ -37,7 +37,7 @@ def make_liiga_team_data(day, data):
     c.execute("INSERT INTO "+data[0]+"(Day_ID , Games_Played, Wins, Draw, Losses, Overtime_Wins, Goals_For, Goals_Against, Points) VALUES ( ?,?,?,?,?,?,?,?,?)", (day, data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7], data[8]))
     conn.commit()
 #Update teams and league table
-def download_update_liiga():
+def download_update_liiga(update):
     try:
         response = urllib.request.urlopen('http://liiga.fi/sarjataulukko')
         parser = LiigaHTMLParser()
@@ -54,8 +54,9 @@ def download_update_liiga():
             team_data_updaet()
             league_table.clear()
             return(True)
+    Consol.Message("NO UPDATE")
     league_table.clear()
-    return(False)
+    return(update)
 
 def team_data_updaet():
     TIME = datetime.date.today()
