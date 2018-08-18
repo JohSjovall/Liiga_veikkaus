@@ -98,3 +98,4 @@ class LiigaHTMLParser(HTMLParser):
         #print(league_table)
 create_league_table()
 create_Liiga_teams_tables()
+#download_update_liiga(False)
