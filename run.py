@@ -11,7 +11,7 @@ Consol.Message("SERVER ON")
 try:
     while True:
         timeHouer = int(datetime.datetime.fromtimestamp(time.time()).strftime('%H'))
-        if timeHouer == 3 and timeHouer == 5:
+        if timeHouer == 3 or timeHouer == 5:
             update = game.download_update_liiga(update)
         if update:
             player.make_updates()
