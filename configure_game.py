@@ -95,7 +95,5 @@ class LiigaHTMLParser(HTMLParser):
                     league_table[len(league_table)-1].append(int(data))   
             except:
                 pass
-        #print(league_table)
 create_league_table()
 create_Liiga_teams_tables()
-#download_update_liiga(False)

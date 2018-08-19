@@ -215,4 +215,3 @@ def send_mail_players_and_admin():
         make_admin_messages()
     except:
         Consol.Message('ERROR: ADMINS MAILS SENDIN FAILL')
-send_mail_players_and_admin()

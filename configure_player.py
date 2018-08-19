@@ -128,4 +128,3 @@ def make_updates():
     make_game_tabel_data()
 create_tables()
 create_games_tables()
-make_updates()

@@ -18,6 +18,7 @@ try:
             sendMessage = True
             update = False
         if sendMessage and timeHouer == 7:
+            mail.send_mail_players_and_admin()
             sendMessage = False
         time.sleep(3600)
 except Exception as e:
