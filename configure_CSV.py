@@ -1,14 +1,17 @@
 import csv
 import sqlite3
 import configure_player as con_player
+import Consol
 
 conn = sqlite3.connect('Database_liiga_game.db')
 c = conn.cursor()
 
 def csv_read_test(dokument_name):
+    print("---------------------------------------------")
     with open("Game_CSV_files/"+dokument_name+'.csv', 'r') as file:
         csv_reader_1 = csv.reader(file)
         next(csv_reader_1)
+        continue_reder = True
         for line in csv_reader_1:
             teamList=[]
             miss = False
@@ -18,19 +21,20 @@ def csv_read_test(dokument_name):
                 if line[x] in teamList:
                     tooMuch.append(line[x])
                     miss = True
+                    continue_reder = False
                 else:
                     teamList.append(line[x])
-        if miss:
-            print(line[3].upper(),line[4].upper(),line[1])
-            print("TO MANY TIME: "+tooMuch)
-            for x in teamList:
-                if x in missTemas:
-                    missTemas.remove(x)
-                else:
-                    pass
-            print("NO NAME ON LIST: "+missTemas)
-            print("---------------------------------------------")
-        else:
+            if miss:
+                print(line[3].upper(),line[4].upper(),line[1])
+                print("TO MANY TIME: "+str(tooMuch))
+                for x in teamList:
+                    if x in missTemas:
+                        missTemas.remove(x)
+                    else:
+                        pass
+                print("NO NAME ON LIST: "+str(missTemas))
+                print("---------------------------------------------")
+        if continue_reder:
             read_csv_dokument(dokument_name)
             pass
 def read_csv_dokument(dokument_name):
@@ -63,6 +67,7 @@ def read_csv_dokument(dokument_name):
                     guesses += ","+line[x]
                 maxPID = make_player_and_guess(maxPID, maxGID, guesses, line[3:5],mail)
         print("---------------------------------------------")
+        Consol.Message("NEW PLAYER DATA ADD")
         con_player.create_games_tables()
         con_player.make_updates()
         print("---------------------------------------------")
@@ -103,10 +108,10 @@ def make_player_and_guess(pID, gID, data,pName,mail):
         if gID in c.fetchall():
             print("PLAYER "+pName[0].upper()+" "+pName[1].upper()+" IS REDEY IN THE GAME")
         else:
-            print("PLAYER: "+pName[0].upper()+" "+pName[1].upper()+" ID NUMBER: "+str(pID)+" IS REDY")
+            print("PLAYER: "+pName[0].upper()+" "+pName[1].upper()+" IS REDY")
             c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(playerID[0],gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
             conn.commit()
-            print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME:"+str(gID)+" IS DONE")
+            print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME: "+str(gID)+" IS DONE")
         return(pID)
 
 while True:
