@@ -19,7 +19,7 @@ def create_games_tables():
         c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name, Last_Name, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
 
 def update_game_data(day, name, data): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
-    c.execute("UPDATE "+name+" SET Day_ID = ?, Player_ID = ?, First_Name = ?, Last_Name = ?, Points = ?, Place = ?, Shared_Place = ? WHERE Day_ID = "+str(day)+" AND Player_ID = "+str(data[1])+"",(day,data[1],data[2],data[3],data[4],data[5],data[6]))
+    c.execute("UPDATE "+str(name)+" SET Day_ID = ?, Player_ID = ?, First_Name = ?, Last_Name = ?, Points = ?, Place = ?, Shared_Place = ? WHERE Day_ID = ? AND Player_ID = ?", (day,data[1],data[2],data[3],data[4],data[5],data[6],day,data[1]))
     conn.commit()
 
 def make_game_data(day, name, data): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
@@ -92,6 +92,7 @@ def make_game_tabel_data():
                 pointMember = playersData[1][4]
                 c.execute("SELECT MAX(Day_ID) FROM "+str(game[1]))
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
+                counter = 0
                 for player in playersData:
                     if player[4] == pointMember:
                         player += (placeMember,)
@@ -100,7 +101,14 @@ def make_game_tabel_data():
                     if player[4] != pointMember:
                         placeMember = place
                         player += (placeMember,)
-                        player += (0,)
+                        try:
+                            if int(player[4]) == int(playersData[counter+1][4]):
+                                player += (1,)
+
+                            else:
+                                player += (0,)
+                        except:
+                            player += (0,)
                         place += 1
                         pointMember = player[4]
                     if maxDay == True:
@@ -109,6 +117,7 @@ def make_game_tabel_data():
                     if maxDay == False:
                         make_game_data(day,game[1],player)
                         Consol.Message("GAME "+str(game[1])+" ADD PLAYER "+str(player[1])+" DATA")
+                    counter += 1
                 Consol.Message("GAME "+game[1]+" TABEL IS UPDATED")
             else:
                 playersData[0] += (1,)
