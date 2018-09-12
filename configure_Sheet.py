@@ -13,7 +13,7 @@ h2 = 'PERHE'
 #Day_ID, Player_ID, First_Name, Last_Name, Points
 def Sheet_Update():
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-    service = ServiceAccountCredentials.from_json_keyfile_name('liigaveikkaus-391eccb27570.json', scope)
+    service = ServiceAccountCredentials.from_json_keyfile_name(configure.JSON, scope)
     gc = gspread.authorize(service)
     Consol.Message('SHEET UPDATE HEMMINKI: START')
     try: #h1
