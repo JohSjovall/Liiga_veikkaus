@@ -6,12 +6,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 import Consol
 import configure
 
-conn = sqlite3.connect('Database_liiga_game.db')
-c = conn.cursor()
 h1 = 'HEMMINKI'
 h2 = 'PERHE'
 #Day_ID, Player_ID, First_Name, Last_Name, Points
 def Sheet_Update():
+    conn = sqlite3.connect('Database_liiga_game.db')
+    c = conn.cursor()
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     service = ServiceAccountCredentials.from_json_keyfile_name(configure.JSON, scope)
     gc = gspread.authorize(service)
@@ -45,8 +45,11 @@ def Sheet_Update():
         Consol.Message('SHEET UPDATE DONE: PERHE')
     except Exception as e:
         Consol.Message('SHEET UPDATE PERHE: ERROR ('+ str(e) +')')
+    conn.close()
 
 def Sheet_Player_History():
+    conn = sqlite3.connect('Database_liiga_game.db')
+    c = conn.cursor()
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     service = ServiceAccountCredentials.from_json_keyfile_name('liigaveikkaus-391eccb27570.json', scope)
     gc = gspread.authorize(service)
@@ -59,7 +62,7 @@ def Sheet_Player_History():
         c.execute('SELECT Points FROM '+h1+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h1+') ORDER BY Last_Name, First_Name')
         for x in c.fetchall():
             Line += [x[0]]
-        print(Line)
+        #print(Line)
         wks.append_row(Line)
         Consol.Message('SHEET HISTORY UPDATE DONE: HEMMINKI')
     except Exception as e:
@@ -73,11 +76,12 @@ def Sheet_Player_History():
         c.execute('SELECT Points FROM '+h2+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h2+') ORDER BY Last_Name, First_Name')
         for x in c.fetchall():
             Line += [x[0]]
-        print(Line)
+        #print(Line)
         wks.append_row(Line)
         Consol.Message('SHEET HISTORY UPDATE DONE: PERHE')
     except Exception as e:
         Consol.Message('SHEET HISTORY UPDATE PERHE: ERROR('+str(e)+')')
+    conn.close()
 def Sheet_Server_run():
     try:
         Consol.Message('SHEET SERVER: ON')

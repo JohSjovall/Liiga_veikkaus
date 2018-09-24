@@ -2,31 +2,29 @@ import datetime
 import sqlite3
 import Consol
 
-conn = sqlite3.connect('Database_liiga_game.db')
-c = conn.cursor()
 team_list = "HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT"
 
-def create_tables():
+def create_tables(c):
     c.execute("CREATE TABLE IF NOT EXISTS PLAYERS(Player_ID INTEGER PRIMARY KEY, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Mail TEXT)")
     c.execute("CREATE TABLE IF NOT EXISTS GAMES(Game_ID INTEGER PRIMARY KEY, Game_Name TEXT NOT NULL UNIQUE)")
     c.execute("CREATE TABLE IF NOT EXISTS PLAYERS_GUESSES(Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, Game_ID REFERENCES GAMES(Game_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, CONSTRAINT PlayerGame_PK PRIMARY KEY(Player_ID, Game_ID))")
     c.execute("CREATE TABLE IF NOT EXISTS PLAYERS_POINTS(Day_ID DATE NOT NULL, Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE , Game_ID REFERENCES GAMES(Game_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, Six_Correct_Point INT, Points INT, CONSTRAINT DayPlayerGame_PK PRIMARY KEY(Day_ID, Player_ID, Game_ID))")
     c.execute("CREATE TABLE IF NOT EXISTS ADMINS(Admin_ID INTEGER PRIMARY KEY, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Mail TEXT NOT NULL, Games_ID TEXT)")
-def create_games_tables():
+def create_games_tables(c):
     c.execute("SELECT Game_Name FROM GAMES")
     gamesList = c.fetchall()
     for game in gamesList:
         c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name, Last_Name, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
 
-def update_game_data(day, name, data): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
+def update_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
     c.execute("UPDATE "+str(name)+" SET Day_ID = ?, Player_ID = ?, First_Name = ?, Last_Name = ?, Points = ?, Place = ?, Shared_Place = ? WHERE Day_ID = ? AND Player_ID = ?", (day,data[1],data[2],data[3],data[4],data[5],data[6],day,data[1]))
     conn.commit()
 
-def make_game_data(day, name, data): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
+def make_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
     c.execute("INSERT INTO "+name+" (Day_ID, Player_ID, First_Name, Last_Name, Points, Place, Shared_Place) VALUES (?,?,?,?,?,?,?)",(day,data[1],data[2],data[3],data[4],data[5],data[6]))
     conn.commit()
 
-def make_players_points():
+def make_players_points(c,conn):
     day = datetime.date.today()
     c.execute("SELECT "+team_list+" FROM LIIGA_LEAGUE_TABLE WHERE Day_ID = (SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE)")
     league_table = c.fetchone()
@@ -79,7 +77,7 @@ def make_players_points():
         except:
             Consol.Message("FAILL POINTS UPDATE PALYER "+str(player[15])+" GAME "+str(player[16]))
 
-def make_game_tabel_data():
+def make_game_tabel_data(c,conn):
     day = datetime.date.today()
     c.execute("SELECT Game_ID, Game_Name FROM GAMES")
     for game in c.fetchall():
@@ -112,10 +110,10 @@ def make_game_tabel_data():
                         place += 1
                         pointMember = player[4]
                     if maxDay == True:
-                        update_game_data(day,game[1],player)
+                        update_game_data(day,game[1],player,c,conn)
                         Consol.Message("GAME "+str(game[1])+" UPDATE PLAYER "+str(player[1])+" DATA")
                     if maxDay == False:
-                        make_game_data(day,game[1],player)
+                        make_game_data(day,game[1],player,c,conn)
                         Consol.Message("GAME "+str(game[1])+" ADD PLAYER "+str(player[1])+" DATA")
                     counter += 1
                 Consol.Message("GAME "+game[1]+" TABEL IS UPDATED")
@@ -125,15 +123,22 @@ def make_game_tabel_data():
                 c.execute("SELECT MAX(Day_ID) FROM "+str(game[1]))
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
                 if maxDay:
-                    update_game_data(day,game[1],player)
+                    update_game_data(day,game[1],player,c,conn)
                 else:
-                    make_game_data(day,game[1],player)
+                    make_game_data(day,game[1],player,c,conn)
                 Consol.Message("GAME "+str(game[1])+" TABEL IS UPDATED")
         except:
             Consol.Message("GAME "+str(game[1])+" TABEL UPDATED FAILL")
             pass
 def make_updates():
-    make_players_points()
-    make_game_tabel_data()
-create_tables()
-create_games_tables()
+    conn = sqlite3.connect('Database_liiga_game.db')
+    c = conn.cursor()
+    make_players_points(c,conn)
+    make_game_tabel_data(c,conn)
+    conn.close()
+
+con = sqlite3.connect('Database_liiga_game.db')
+cv = con.cursor()
+create_tables(cv)
+create_games_tables(cv)
+con.close()

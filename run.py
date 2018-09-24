@@ -3,6 +3,7 @@ import time
 import configure_game as game
 import configure_player as player
 import configure_mails as mail
+import configure_Sheet as Sheet
 import configure
 import Consol
 
@@ -26,7 +27,9 @@ try:
         if sendMessage and timeHouer == 7:
             mail.send_mail_players_and_admin()
             sendMessage = False
+            Sheet.Sheet_Update()
+            Sheet.Sheet_Player_History()
             configure.SAVE()
             time.sleep(3600)
 except Exception as e:
-    Consol.Message("SERVER FAILL: "+e)
+    Consol.Message("SERVER FAILL: "+str(e))

@@ -3,8 +3,6 @@ import sqlite3
 import configure_player as con_player
 import Consol
 
-conn = sqlite3.connect('Database_liiga_game.db')
-c = conn.cursor()
 
 def csv_read_test(dokument_name):
     print("---------------------------------------------")
@@ -38,6 +36,8 @@ def csv_read_test(dokument_name):
             read_csv_dokument(dokument_name)
             pass
 def read_csv_dokument(dokument_name):
+    conn = sqlite3.connect('Database_liiga_game.db')
+    c = conn.cursor()
     c.execute("SELECT Game_Name FROM GAMES WHERE Game_Name = '"+str(dokument_name.upper())+"'")
     IsNone = c.fetchone() == None
     if IsNone:
@@ -53,7 +53,7 @@ def read_csv_dokument(dokument_name):
             maxGID = 1
         else:
             maxGID += 1
-        new_game(maxGID,dokument_name)
+        new_game(maxGID,dokument_name,c,conn)
         with open("Game_CSV_files/"+dokument_name+'.csv', 'r') as file:
             csv_reader = csv.reader(file)
             next(csv_reader)
@@ -65,31 +65,32 @@ def read_csv_dokument(dokument_name):
                     mail=None
                 for x in range(5,20):
                     guesses += ","+line[x]
-                maxPID = make_player_and_guess(maxPID, maxGID, guesses, line[3:5],mail)
+                maxPID = make_player_and_guess(maxPID, maxGID, guesses, line[3:5],mail,c,conn)
         print("---------------------------------------------")
         Consol.Message("NEW PLAYER DATA ADD")
-        con_player.create_games_tables()
-        con_player.make_updates()
+        con_player.create_games_tables(c)
+        #con_player.make_updates()
         print("---------------------------------------------")
     else:
         print("GAME NAME IS ON USE!")
         print("---------------------------------------------")
         pass
-def new_player_guess(pID, gID, data):
+    conn.close()
+def new_player_guess(pID, gID, data,c,conn):
     c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
     conn.commit()
     print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME:"+str(gID)+" IS DONE")
     print("---------------------------------------------")
-def new_player(pID,name,mail):
+def new_player(pID,name,mail,c,conn):
     c.execute("INSERT INTO PLAYERS(Player_ID, First_Name, Last_Name, Mail) VALUES (?,?,?,?)",(pID,name[0].upper(),name[1].upper(),mail))
     conn.commit()
     print("NEW PLAYER: "+name[0].upper()+" "+name[1].upper()+" ID NUMBER: "+str(pID)+" IS DONE")
-def new_game(gID, name):
+def new_game(gID, name,c,conn):
     c.execute("INSERT INTO GAMES(Game_ID, Game_Name) VALUES (?,?)",(gID,name.upper()))
     conn.commit()
     print("NEW GAME: "+name.upper()+" ID NUMBER: "+str(gID)+" IS DONE")
     print("---------------------------------------------")
-def make_player_and_guess(pID, gID, data,pName,mail):
+def make_player_and_guess(pID, gID, data,pName,mail,c,conn):
     if mail is None:
         c.execute("SELECT Player_ID FROM PLAYERS WHERE First_Name = ? AND Last_Name = ? AND Mail IS NULL",(pName[0].upper(),pName[1].upper()))
     else:
