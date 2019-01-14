@@ -11,15 +11,6 @@ Pelaajat saavat sähköpostitse oman piste historian
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
 <body>
-<style>
-table, th, td {
-border: 1px solid black;
-border-collapse: collapse;
-}
-th {
-text-align: left;
-}
-</style>
 <font face="Arial"><p>Hei <b>PELAAJA1</b></p>
 <p>Olet <b>TESTIPELIN</b> pelissa sijalla <b>1</b></p>
 <p> </p>
@@ -313,20 +304,10 @@ text-align: left;
 
 Pelin ylläpitäjille lähetetään sähköpostilla pelin runkosrajan
 
-```html
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii"></head>
 <body>
-<style>
-table, th, td {
-border: 1px solid black;
-border-collapse: collapse;
-}
-th {
-text-align: left;
-}
-</style>
 <font face="Arial"><h3>TESTIPELIN RUNKOSARJA 2019-01-12</h3>
 <table style="width:50%">
 <tr align="left">
