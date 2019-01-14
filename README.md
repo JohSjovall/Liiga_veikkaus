@@ -11,7 +11,7 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
 <body>
-<font face="Arial"><p>Hei <b>PELAAJA1</b></p>
+<font face="Arial"><p>Hei <b>PELAAJA 1</b></p>
 <p>Olet <b>TESTIPELIN</b> pelissa sijalla <b>1</b></p>
 <p> </p>
 <h3>RUNKOSARJA JA VEIKKAUKSESI: 2019-01-12</h3><table style="width:25%">
