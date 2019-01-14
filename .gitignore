@@ -1,0 +1,8 @@
+*.db
+configure.py
+run_one_time.py
+quickstart.py
+*.json
+/Game_CSV_files/
+**/
+*.csv
