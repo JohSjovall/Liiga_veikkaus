@@ -8,7 +8,6 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 
 Pelaajat saavat sähköpostitse oman piste historian
 
-```html
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
 <body>
@@ -311,7 +310,6 @@ text-align: left;
 </font>
 </body>
 </html>
-```
 
 Pelin ylläpitäjille lähetetään sähköpostilla pelin runkosrajan
 
