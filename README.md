@@ -6,7 +6,7 @@ Ohjelman tarkoituksena on pitää kirjaa Liigan sarjataulukko tapahtumista ja yl
 
 Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kierokselta
 
-## Pelaajat saavat sähköpostitse oman piste historian
+## Pelaajat saavat sähköpostitse kieroksen  pisteet ja  piste historiansa
 
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
@@ -351,4 +351,3 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 </font>
 </body>
 </html>
-```
