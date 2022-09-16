@@ -12,8 +12,7 @@ h2 = 'PERHE'
 def Sheet_Update():
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
-    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-    service = ServiceAccountCredentials.from_json_keyfile_name(configure.JSON, scope)
+    service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
     gc = gspread.authorize(service)
     Consol.Message('SHEET UPDATE HEMMINKI: START')
     try: #h1
@@ -50,8 +49,7 @@ def Sheet_Update():
 def Sheet_Player_History():
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
-    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-    service = ServiceAccountCredentials.from_json_keyfile_name('liigaveikkaus-391eccb27570.json', scope)
+    service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
     gc = gspread.authorize(service)
     Consol.Message('START SHEET HISTORY UPDATE: HEMMINKI')
     try: #h1
