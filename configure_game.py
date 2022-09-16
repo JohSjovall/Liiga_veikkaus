@@ -3,12 +3,16 @@ import urllib.request
 import sqlite3
 from html.parser import HTMLParser
 import Consol
+import configure
+import json
 
+league_table = []
 #league_table
 def create_league_table(c):
     c.execute("CREATE TABLE IF NOT EXISTS LIIGA_LEAGUE_TABLE(Day_ID DATE PRIMARY KEY, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
 #Liigakierros
 def make_liigakerros_data(day,c,conn):
+    global league_table
     data = "Day_ID"
     for x in range(len(league_table)):
         data = data+", "+league_table[x][0]
@@ -34,12 +38,16 @@ def make_liiga_team_data(day, data,c,conn):
     conn.commit()
 #Update teams and league table
 def download_update_liiga(update):
+    global league_table
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
     try:
-        response = urllib.request.urlopen('http://liiga.fi/sarjataulukko')
-        parser = LiigaHTMLParser()
-        parser.feed(str(response.read()))
+        response = urllib.request.urlopen(configure.URL)
+        #data = response.read().decode("utf-8")
+        json_data = json.loads(response.read())
+        league_table = update_liiga_data(json_data)
+        #parser = LiigaHTMLParser()
+        #parser.feed(str(response.read()))
     except EnvironmentError:
         Consol.Message("ERROR! NO CONNECT!")
     for x in range(len(league_table)):
@@ -94,7 +102,24 @@ class LiigaHTMLParser(HTMLParser):
                     league_table[len(league_table)-1].append(int(data))   
             except:
                 pass
-league_table = []
+
+def update_liiga_data(data):
+    global league_table
+    league_table = [[]] * 15
+    for i in range(0,14):
+        team = data[i]
+        ranking = int(team["standings_ranking"])-1 #list position is rankig palce
+        league_table[ranking] = [str(team['slug']).upper()] #Team name
+        league_table[ranking].append(str(team['games'])) #Games_Played
+        league_table[ranking].append(str(team['games_won'])) #Wins
+        league_table[ranking].append(str(team['games_tied'])) #Draws
+        league_table[ranking].append(str(team['games_lost'])) #Losses
+        league_table[ranking].append(str(team['ot_ps_won'])) #Overtime_Wins
+        league_table[ranking].append(str(team['goals_for'])) #Goals_for
+        league_table[ranking].append(str(team['goals_against'])) #Goals_Against
+        league_table[ranking].append(str(team['points'])) #Points
+    return league_table
+
 con = sqlite3.connect('Database_liiga_game.db')
 cv = con.cursor()
 create_league_table(cv)
