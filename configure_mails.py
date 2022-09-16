@@ -12,19 +12,17 @@ def send_mail(to, subject, html):
     try:
         me = configure.USER
         setup = configure.SETUP
-        msg = MIMEMultipart('alternative')
+        msg = MIMEMultipart()
         msg['Subject'] = subject
         msg['From'] = me
         msg['To'] = to
         part = MIMEText(html, 'html')
         msg.attach(part)
 
-        server = smtplib.SMTP('smtp.gmail.com:587')
-        server.ehlo()
+        server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(me, setup)
         server.sendmail(me, to, msg.as_string())
-        server.send
         server.quit
         Consol.Message('EMAIL TO: '+to+' SUCCEED')
     except:

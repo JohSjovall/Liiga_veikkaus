@@ -64,4 +64,6 @@ while on:
     if inputs.upper() == 'D':
         delete_admin()
     if inputs.upper() == 'Q':
+        conn.close()
+
         on = False
