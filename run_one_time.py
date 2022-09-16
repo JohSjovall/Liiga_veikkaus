@@ -15,7 +15,6 @@ try:
         player.make_updates()
         mail.send_mail_players_and_admin()
         #if history == True:
-                print('done')
         Sheet.Sheet_Player_History()
         Consol.Message("SERVER ONE TIME RUN DONE")
         configure.SAVE()
