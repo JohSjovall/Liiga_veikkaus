@@ -4,3 +4,4 @@ quickstart.py
 *.json
 **/
 *.csv
+.vscode
