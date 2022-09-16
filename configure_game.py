@@ -92,7 +92,6 @@ def update_liiga_data(data):
     season = data['season']
     for i in range(0,15):
         team = season[i]
-        print(i," : ",str(team['teamId']))
         temp_league_table[i] = [teams[str(team['teamId'])]] #Team name
         temp_league_table[i].append(int(team['games'])) #Games_Played
         temp_league_table[i].append(int(team['wins'])) #Wins
