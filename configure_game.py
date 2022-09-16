@@ -3,18 +3,23 @@ import urllib.request
 import sqlite3
 from html.parser import HTMLParser
 import Consol
+import configure
+import json
+import functools
 
 #league_table
 def create_league_table(c):
     c.execute("CREATE TABLE IF NOT EXISTS LIIGA_LEAGUE_TABLE(Day_ID DATE PRIMARY KEY, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
 #Liigakierros
 def make_liigakerros_data(day,c,conn):
+    global league_table
     data = "Day_ID"
     for x in range(len(league_table)):
         data = data+", "+league_table[x][0]
     c.execute("INSERT INTO LIIGA_LEAGUE_TABLE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
     conn.commit()
 def update_liigakierros_data(day,c,conn):
+    global league_table
     data = ""
     for x in range(len(league_table)):
         data = data+str(league_table[x][0])+" = ?"
@@ -34,12 +39,14 @@ def make_liiga_team_data(day, data,c,conn):
     conn.commit()
 #Update teams and league table
 def download_update_liiga(update):
+    global league_table
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
     try:
-        response = urllib.request.urlopen('http://liiga.fi/sarjataulukko')
-        parser = LiigaHTMLParser()
-        parser.feed(str(response.read()))
+        response = urllib.request.urlopen(configure.URL)
+        data = response.read().decode("utf-8")
+        json_data = json.loads(data)
+        league_table = update_liiga_data(json_data)
     except EnvironmentError:
         Consol.Message("ERROR! NO CONNECT!")
     for x in range(len(league_table)):
@@ -58,6 +65,7 @@ def download_update_liiga(update):
     return(update)
 
 def team_data_updaet(c,conn):
+    global league_table
     TIME = datetime.date.today()
     for x in range(len(league_table)):
         try:
@@ -76,24 +84,57 @@ def team_data_updaet(c,conn):
             Consol.Message("NEW DATA LIIGA LEAGUE TABLE DONE")
     except Exception as e:
         Consol.Message("ERROR UPDATE LIIGA LEAGUE TABLE: "+str(e))
-class LiigaHTMLParser(HTMLParser):
-    def handle_data(self, data):
-        teams = ["Lukko","K\\xc3\\xa4rp\\xc3\\xa4t","TPS","Tappara","Sport","Pelicans","KalPa","\\xc3\\x84ss\\xc3\\xa4t","KooKoo","SaiPa","HIFK","HPK","Ilves","Jukurit","JYP"]
-        if data in teams:
-            if data == teams[1]:
-                league_table.append(["KARPAT"])
-            if data == teams[7]:
-                league_table.append(["ASSAT"])
-            if data != teams[1] and data != teams[7]:
-                league_table.append([str(data.upper())])
-            else:
-                pass
-        else:
-            try:
-                if data.isdigit():
-                    league_table[len(league_table)-1].append(int(data))   
-            except:
-                pass
+
+def update_liiga_data(data):
+    global league_table
+    teams = configure.TEAMS
+    temp_league_table = [[]] * 15
+    season = data['season']
+    for i in range(0,15):
+        team = season[i]
+        temp_league_table[i] = [teams[str(team['teamId'])]] #Team name
+        temp_league_table[i].append(int(team['games'])) #Games_Played
+        temp_league_table[i].append(int(team['wins'])) #Wins
+        temp_league_table[i].append(int(int(team['overtimeWins'])+int(team['overtimeLosses']))) #Draws
+        temp_league_table[i].append(int(team['losses'])) #Losses
+        temp_league_table[i].append(int(team['overtimeWins'])) #Overtime_Wins
+        temp_league_table[i].append(int(team['goals'])) #Goals_for
+        temp_league_table[i].append(int(team['goalsAgainst'])) #Goals_Against
+        temp_league_table[i].append(int(team['points'])) #Points
+    temp_league_table_sort = sorted(temp_league_table, key=functools.cmp_to_key(shortGameTable))
+    league_table = temp_league_table_sort
+    return league_table
+
+def shortGameTablePoints(table):
+    return table['0']
+
+
+def shortGameTable(teamA, teamB):
+    if(teamA[8] != teamB[8]): #points
+        return comparing(teamA[8], teamB[8])
+    if(teamA[2] != teamB[2]): #wins
+        return comparing(teamA[2], teamB[2])
+    gdA = teamA[6]-teamA[7]
+    gdB = teamB[6]-teamB[7]
+    if(gdA != gdB): #goalsDifference
+        return goalsDifference(gdA, gdB)
+    if(teamA[6] != teamB[6]): #goals
+        return comparing(teamA[6], teamB[6])
+    return 0
+
+    
+def comparing(a,b):
+    if(a > b):
+        return -1
+    else:
+        return 1
+
+def goalsDifference(a,b):
+    if(a > b):
+        return 1
+    else:
+        return -1
+
 league_table = []
 con = sqlite3.connect('Database_liiga_game.db')
 cv = con.cursor()
