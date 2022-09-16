@@ -32,7 +32,7 @@ def Sheet_Update():
     Consol.Message('SHEET UPDATE PERHE: START')
     try: #h2
         wks = gc.open('Perhe_pisteet').sheet1
-        c.execute('SELECT Last_Name, First_Name, Points FROM '+h2+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h2+') ORDER BY Last_Name, First_Name')
+        c.execute('SELECT First_Name, Last_Name, Points FROM '+h2+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h2+') ORDER BY First_Name, Last_Name')
         row = 2
         for x in c.fetchall():
             #print(x)
