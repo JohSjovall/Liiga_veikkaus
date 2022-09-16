@@ -131,9 +131,9 @@ def comparing(a,b):
 
 def goalsDifference(a,b):
     if(a > b):
-        return 1
-    else:
         return -1
+    else:
+        return 1
 
 league_table = []
 con = sqlite3.connect('Database_liiga_game.db')
