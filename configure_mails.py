@@ -86,11 +86,11 @@ def place_change(name, player_id,c):
     except:
         second = first
     if first < second:
-        return ' &#8593; '+str(abs(first-second))#arrow up
+        return '&nbsp;&#8896; '+str(abs(first-second))#arrow up
     elif first > second:
-        return ' &#8595; '+str(abs(first-second))#arrow down
+        return '&nbsp;&#8897; '+str(abs(first-second))#arrow down
     else:
-        return '&nbsp;-&nbsp;'
+        return '&nbsp;&#9472;&nbsp;'
 def get_player_Shared_Place_and_Place_and_Day_ID(name,player_id,c):
     c.execute("SELECT Shared_Place, Place, Day_ID FROM "+str(name)+" WHERE Day_ID = (SELECT MAX(Day_ID) FROM "+str(name)+" ) AND Player_ID = "+str(player_id))
     return c.fetchone()
