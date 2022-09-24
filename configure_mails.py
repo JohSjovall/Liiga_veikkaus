@@ -78,6 +78,19 @@ def points_change(name, player_id,c):
         return '+'+str(first-second)
     else:
         return str(first-second)
+def place_change(name, player_id,c):
+    c.execute("SELECT Place FROM "+name+" WHERE Player_ID = "+str(player_id)+" ORDER BY Day_ID DESC")
+    first = c.fetchone()[0]
+    try:
+        second = c.fetchone()[0]
+    except:
+        second = first
+    if first < second:
+        return ' &#8593; '+str(abs(first-second))#arrow up
+    elif first > second:
+        return ' &#8595; '+str(abs(first-second))#arrow down
+    else:
+        return '&nbsp;-&nbsp;'
 def get_player_Shared_Place_and_Place_and_Day_ID(name,player_id,c):
     c.execute("SELECT Shared_Place, Place, Day_ID FROM "+str(name)+" WHERE Day_ID = (SELECT MAX(Day_ID) FROM "+str(name)+" ) AND Player_ID = "+str(player_id))
     return c.fetchone()
@@ -171,7 +184,7 @@ def make_admin_messages(c):
             table1 = ''
             gTable = make_game_table_order(gName,c)
             for y in gTable:
-                table1 +='\n<tr>\n<td>'+str(y[0])+'.</td>\n<td>'+y[2]+' '+y[3]+'</td>\n<td>'+str(y[1])+'</td>\n<td>'+points_change(gName,y[5],c)+'</td>\n</tr>'
+                table1 +='\n<tr>\n<td>'+str(y[0])+'.</td>\n<td>'+y[2]+' '+y[3]+'</td>\n<td>'+str(y[1])+'</td>\n<td>'+points_change(gName,y[5],c)+'</td>\n<td>'+place_change(gName,y[5],c)+'</td>\n</tr>'
             message ='''
 <html>
 <body>
@@ -191,6 +204,7 @@ text-align: left;
 <th>PELAAJA</th>
 <th>PISTEET</th>
 <th>PISTE MUUTOS</th>
+<th>SIJOITUS MUUTOS</th>
 </tr>'''+table1+'''
 </table>
 <p> </p>
