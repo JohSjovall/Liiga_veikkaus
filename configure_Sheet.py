@@ -6,80 +6,82 @@ from oauth2client.service_account import ServiceAccountCredentials
 import Consol
 import configure
 
-h1 = 'HEMMINKI'
-h2 = 'PERHE'
 #Day_ID, Player_ID, First_Name, Last_Name, Points
-def Sheet_Update():
+class SheetGame:
+    def __init__(self, id, staus, history, order):
+        self.id = id
+        self.staus = staus
+        self.history = history
+        self.order = order
+    def getOrder(self):
+        if(self.order == 1):
+            return "Last_Name, First_Name"
+        else:
+            return "First_Name, Last_Name"
+
+def Sheet_Table_List():
+    gamesSheetList = []
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
-    service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
-    gc = gspread.authorize(service)
-    Consol.Message('SHEET UPDATE HEMMINKI: START')
-    try: #h1
-        wks = gc.open('Hemminki_pisteet').sheet1
-        c.execute('SELECT Last_Name, First_Name, Points FROM '+h1+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h1+') ORDER BY Last_Name, First_Name')
-        row = 2
-        for x in c.fetchall():
-            #print(x)
-            wks.update_cell(row,1,x[0]+' '+x[1])
-            wks.update_cell(row,2,x[2])
-            row += 1
-        c.execute('SELECT MAX(Day_ID) FROM '+h1)
-        wks.update_cell(1,2,c.fetchone()[0])
-        Consol.Message('SHEET UPDATE HEMMINKI: DONE')
-    except Exception as e:
-        Consol.Message('SHEET UPDATE HEMMINKI: ERROR (' + str(e) +')')
-    Consol.Message('SHEET UPDATE PERHE: START')
-    try: #h2
-        wks = gc.open('Perhe_pisteet').sheet1
-        c.execute('SELECT First_Name, Last_Name, Points FROM '+h2+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h2+') ORDER BY First_Name, Last_Name')
-        row = 2
-        for x in c.fetchall():
-            #print(x)
-            wks.update_cell(row,1,x[0]+' '+x[1])
-            wks.update_cell(row,2,x[2])
-            row += 1
-        c.execute('SELECT MAX(Day_ID) FROM '+h2)
-        wks.update_cell(1,2,c.fetchone()[0])
-        Consol.Message('SHEET UPDATE DONE: PERHE')
-    except Exception as e:
-        Consol.Message('SHEET UPDATE PERHE: ERROR ('+ str(e) +')')
+    c.execute('SELECT Game_ID, Game_staus, Game_history, List_Order FROM SHEET')
+    for data in c.fetchall():
+        gamesSheetList.append(SheetGame(data[0], data[1], data[2], data[3]))
+    return gamesSheetList
+
+def Sheet_Run_List():
+    conn = sqlite3.connect('Database_liiga_game.db')
+    gamesSheetList = Sheet_Table_List()
+    for sheetData in gamesSheetList:
+        Sheet_Update(sheetData, conn)
+        Sheet_Player_History(sheetData, conn)
     conn.close()
 
-def Sheet_Player_History():
-    conn = sqlite3.connect('Database_liiga_game.db')
+
+def Sheet_Update(sheetData: SheetGame, conn: sqlite3.Connection):
     c = conn.cursor()
+    gameName = getGameName(sheetData, c)
     service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
     gc = gspread.authorize(service)
-    Consol.Message('START SHEET HISTORY UPDATE: HEMMINKI')
-    try: #h1
-        wks = gc.open('Hemminki_pistekehitys').sheet1
-        c.execute('SELECT MAX(Day_ID) FROM '+h1)
+    Consol.Message('SHEET STATUS '+gameName+': START')
+    try:
+        wks = gc.open(sheetData.staus).sheet1
+        c.execute('SELECT '+sheetData.getOrder()+', Points FROM '+gameName+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+gameName+') ORDER BY '+sheetData.getOrder())
+        row = 2
+        for x in c.fetchall():
+            #print(x)
+            wks.update_cell(row,1,x[0]+' '+x[1])
+            wks.update_cell(row,2,x[2])
+            row += 1
+        c.execute('SELECT MAX(Day_ID) FROM '+gameName)
+        wks.update_cell(1,2,c.fetchone()[0])
+        Consol.Message('SHEET STATUS '+gameName+': DONE')
+    except Exception as e:
+        Consol.Message('SHEET STATUS '+gameName+': ERROR (' + str(e) +')')
+
+def getGameName(sheetData: SheetGame, c: sqlite3.Cursor):
+    c.execute('SELECT Game_Name FROM GAMES WHERE Game_ID = ?',(str(sheetData.id)))
+    gameName = c.fetchone()[0]
+    return gameName
+
+def Sheet_Player_History(sheetData: SheetGame, conn: sqlite3.Connection):
+    c = conn.cursor()
+    gameName = getGameName(sheetData, c)
+    service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
+    gc = gspread.authorize(service)
+    Consol.Message('START SHEET HISTORY '+gameName+': START')
+    try:
+        wks = gc.open(sheetData.history).sheet1
+        c.execute('SELECT MAX(Day_ID) FROM '+gameName)
         Day = c.fetchone()[0]
         Line = [Day]
-        c.execute('SELECT Points FROM '+h1+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h1+') ORDER BY Last_Name, First_Name')
+        c.execute('SELECT Points FROM '+gameName+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+gameName+') ORDER BY Last_Name, First_Name')
         for x in c.fetchall():
             Line += [x[0]]
         #print(Line)
         wks.append_row(Line)
-        Consol.Message('SHEET HISTORY UPDATE DONE: HEMMINKI')
+        Consol.Message('SHEET HISTORY '+gameName+': DONE')
     except Exception as e:
-        Consol.Message('SHEET HISTORY UPDATE HEMMINKI: ERROR('+str(e)+')')
-    Consol.Message('START SHEET HISTORY UPDATE: PERHE')
-    try: #h2
-        wks = gc.open('Perhe_pistekehitys').sheet1
-        c.execute('SELECT MAX(Day_ID) FROM '+h2)
-        Day = c.fetchone()[0]
-        Line = [Day]
-        c.execute('SELECT Points FROM '+h2+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+h2+') ORDER BY Last_Name, First_Name')
-        for x in c.fetchall():
-            Line += [x[0]]
-        #print(Line)
-        wks.append_row(Line)
-        Consol.Message('SHEET HISTORY UPDATE DONE: PERHE')
-    except Exception as e:
-        Consol.Message('SHEET HISTORY UPDATE PERHE: ERROR('+str(e)+')')
-    conn.close()
+        Consol.Message('SHEET HISTORY '+gameName+': ERROR('+str(e)+')')
 def Sheet_Server_run():
     try:
         Consol.Message('SHEET SERVER: ON')
@@ -88,7 +90,7 @@ def Sheet_Server_run():
             time.sleep(900)
             timeHouer = int(datetime.datetime.fromtimestamp(time.time()).strftime('%H'))
             if timeHouer==8:
-                Sheet_Update()
+                Sheet_Run_List()
                 time.sleep(3600)
                 configure.SAVE()
     except Exception as e:

@@ -27,8 +27,7 @@ try:
         if sendMessage and timeHouer == 7:
             mail.send_mail_players_and_admin()
             sendMessage = False
-            Sheet.Sheet_Update()
-            Sheet.Sheet_Player_History()
+            Sheet.Sheet_Run_List()
             configure.SAVE()
             time.sleep(3600)
 except Exception as e:
