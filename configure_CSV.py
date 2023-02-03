@@ -71,26 +71,27 @@ def read_csv_dokument(dokument_name):
         con_player.create_games_tables(c)
         #con_player.make_updates()
         print("---------------------------------------------")
+        sheet_options(maxGID, c, conn)
     else:
         print("GAME NAME IS ON USE!")
         print("---------------------------------------------")
         pass
     conn.close()
-def new_player_guess(pID, gID, data,c,conn):
+def new_player_guess(pID, gID, data,c: sqlite3.Cursor,conn: sqlite3.Connection):
     c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
     conn.commit()
     print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME:"+str(gID)+" IS DONE")
     print("---------------------------------------------")
-def new_player(pID,name,mail,c,conn):
+def new_player(pID,name,mail,c: sqlite3.Cursor,conn: sqlite3.Connection):
     c.execute("INSERT INTO PLAYERS(Player_ID, First_Name, Last_Name, Mail) VALUES (?,?,?,?)",(pID,name[0].upper(),name[1].upper(),mail))
     conn.commit()
     print("NEW PLAYER: "+name[0].upper()+" "+name[1].upper()+" ID NUMBER: "+str(pID)+" IS DONE")
-def new_game(gID, name,c,conn):
+def new_game(gID, name,c: sqlite3.Cursor,conn: sqlite3.Connection):
     c.execute("INSERT INTO GAMES(Game_ID, Game_Name) VALUES (?,?)",(gID,name.upper()))
     conn.commit()
     print("NEW GAME: "+name.upper()+" ID NUMBER: "+str(gID)+" IS DONE")
     print("---------------------------------------------")
-def make_player_and_guess(pID, gID, data,pName,mail,c,conn):
+def make_player_and_guess(pID, gID, data,pName,mail,c: sqlite3.Cursor,conn: sqlite3.Connection):
     if mail is None:
         c.execute("SELECT Player_ID FROM PLAYERS WHERE First_Name = ? AND Last_Name = ? AND Mail IS NULL",(pName[0].upper(),pName[1].upper()))
     else:
@@ -114,6 +115,36 @@ def make_player_and_guess(pID, gID, data,pName,mail,c,conn):
             conn.commit()
             print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME: "+str(gID)+" IS DONE")
         return(pID)
+def sheet_options(game_id: int, c: sqlite3.Cursor, conn: sqlite3.Connection):
+    print("--------------SHEET CONFIGURE START--------------")
+    while True:
+        inputValaue = str(input("SET SHEET CONFIGURES (yes/no): "))
+        if inputValaue.upper() == 'YES':
+            sheet_configure(game_id, c, conn)
+            break
+        if inputValaue.upper() == 'NO':
+            break
+        else:
+            print('not validation value!')
+    print("--------------SHEET CONFIGURE END--------------")
+
+def sheet_configure(game_id: int, c: sqlite3.Cursor, conn: sqlite3.Connection):
+    state = str(input("GAME SHEET STATE NAME: "))
+    history = str(input("GAME SHEET HISTORY NAME: "))
+    print('ORDERS | 0 = First Name Last Name | 1 = Last Name First Name |')
+    order = 1
+    while True:
+        inputValaue = str(input("GAME SHEET ORDER: "))
+        if inputValaue == '1':
+            order = 1
+            break
+        if inputValaue == '0':
+            order = 0
+            break
+        else:
+            print('not validation value!')
+    c.execute('INSERT INTO SHEET(Game_ID, Game_staus, Game_history, List_Order) VALUES (?,?,?,?)',(game_id, state, history, order))
+    conn.commit()
 
 while True:
     try:
