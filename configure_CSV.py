@@ -76,21 +76,21 @@ def read_csv_dokument(dokument_name):
         print("---------------------------------------------")
         pass
     conn.close()
-def new_player_guess(pID, gID, data,c,conn):
+def new_player_guess(pID, gID, data,c: sqlite3.Cursor,conn: sqlite3.Connection):
     c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
     conn.commit()
     print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME:"+str(gID)+" IS DONE")
     print("---------------------------------------------")
-def new_player(pID,name,mail,c,conn):
+def new_player(pID,name,mail,c: sqlite3.Cursor,conn: sqlite3.Connection):
     c.execute("INSERT INTO PLAYERS(Player_ID, First_Name, Last_Name, Mail) VALUES (?,?,?,?)",(pID,name[0].upper(),name[1].upper(),mail))
     conn.commit()
     print("NEW PLAYER: "+name[0].upper()+" "+name[1].upper()+" ID NUMBER: "+str(pID)+" IS DONE")
-def new_game(gID, name,c,conn):
+def new_game(gID, name,c: sqlite3.Cursor,conn: sqlite3.Connection):
     c.execute("INSERT INTO GAMES(Game_ID, Game_Name) VALUES (?,?)",(gID,name.upper()))
     conn.commit()
     print("NEW GAME: "+name.upper()+" ID NUMBER: "+str(gID)+" IS DONE")
     print("---------------------------------------------")
-def make_player_and_guess(pID, gID, data,pName,mail,c,conn):
+def make_player_and_guess(pID, gID, data,pName,mail,c: sqlite3.Cursor,conn: sqlite3.Connection):
     if mail is None:
         c.execute("SELECT Player_ID FROM PLAYERS WHERE First_Name = ? AND Last_Name = ? AND Mail IS NULL",(pName[0].upper(),pName[1].upper()))
     else:
