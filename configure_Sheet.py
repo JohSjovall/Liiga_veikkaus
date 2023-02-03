@@ -6,8 +6,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import Consol
 import configure
 
-h1 = 'HEMMINKI'
-h2 = 'PERHE'
 #Day_ID, Player_ID, First_Name, Last_Name, Points
 class SheetGame:
     def __init__(self, id, staus, history, order):
