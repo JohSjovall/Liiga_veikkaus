@@ -71,6 +71,7 @@ def read_csv_dokument(dokument_name):
         con_player.create_games_tables(c)
         #con_player.make_updates()
         print("---------------------------------------------")
+        sheet_options(maxGID, c, conn)
     else:
         print("GAME NAME IS ON USE!")
         print("---------------------------------------------")
@@ -114,6 +115,36 @@ def make_player_and_guess(pID, gID, data,pName,mail,c: sqlite3.Cursor,conn: sqli
             conn.commit()
             print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME: "+str(gID)+" IS DONE")
         return(pID)
+def sheet_options(game_id: int, c: sqlite3.Cursor, conn: sqlite3.Connection):
+    print("--------------SHEET CONFIGURE START--------------")
+    while True:
+        inputValaue = str(input("SET SHEET CONFIGURES (yes/no): "))
+        if inputValaue.upper() == 'YES':
+            sheet_configure(game_id, c, conn)
+            break
+        if inputValaue.upper() == 'NO':
+            break
+        else:
+            print('not validation value!')
+    print("--------------SHEET CONFIGURE END--------------")
+
+def sheet_configure(game_id: int, c: sqlite3.Cursor, conn: sqlite3.Connection):
+    state = str(input("GAME SHEET STATE NAME: "))
+    history = str(input("GAME SHEET HISTORY NAME: "))
+    print('ORDERS | 0 = First Name Last Name | 1 = Last Name First Name |')
+    order = 1
+    while True:
+        inputValaue = str(input("GAME SHEET ORDER: "))
+        if inputValaue == '1':
+            order = 1
+            break
+        if inputValaue == '0':
+            order = 0
+            break
+        else:
+            print('not validation value!')
+    c.execute('INSERT INTO SHEET(Game_ID, Game_staus, Game_history, List_Order) VALUES (?,?,?,?)',(game_id, state, history, order))
+    conn.commit()
 
 while True:
     try:
