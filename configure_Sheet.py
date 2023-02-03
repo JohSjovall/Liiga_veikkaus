@@ -9,9 +9,28 @@ import configure
 h1 = 'HEMMINKI'
 h2 = 'PERHE'
 #Day_ID, Player_ID, First_Name, Last_Name, Points
-def Sheet_Update():
+class SheetGame:
+    def __init__(self, id, staus, history, order):
+        self.id = id
+        self.staus = staus
+        self.history = history
+        self.order = order
+    def getOrder(self):
+        if(self.order == 1):
+            return "Last_Name, First_Name"
+        else:
+            return "First_Name, Last_Name"
+
+def Sheet_Table_List():
+    gamesSheetList = []
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
+    c.execute('SELECT Game_ID, Game_staus, Game_history, List_Order FROM SHEET')
+    for data in c.fetchall():
+        print(data)
+        gamesSheetList.append(SheetGame(data[0], data[1], data[2], data[3]))
+    return gamesSheetList
+
     service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
     gc = gspread.authorize(service)
     Consol.Message('SHEET UPDATE HEMMINKI: START')
