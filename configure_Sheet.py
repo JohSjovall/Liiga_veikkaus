@@ -25,7 +25,6 @@ def Sheet_Table_List():
     c = conn.cursor()
     c.execute('SELECT Game_ID, Game_staus, Game_history, List_Order FROM SHEET')
     for data in c.fetchall():
-        print(data)
         gamesSheetList.append(SheetGame(data[0], data[1], data[2], data[3]))
     return gamesSheetList
 
@@ -40,14 +39,13 @@ def Sheet_Run_List():
 
 def Sheet_Update(sheetData: SheetGame, conn: sqlite3.Connection):
     c = conn.cursor()
-    c.execute('SELECT Game_Name FROM Games WHERE Games_ID = '+sheetData.id+')')
-    gameName = c.fetchone
+    gameName = getGameName(sheetData, c)
     service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
     gc = gspread.authorize(service)
-    Consol.Message('SHEET UPDATE '+gameName+': START')
+    Consol.Message('SHEET STATUS '+gameName+': START')
     try:
         wks = gc.open(sheetData.staus).sheet1
-        c.execute('SELECT Last_Name, First_Name, Points FROM '+gameName+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+gameName+') ORDER BY '+sheetData.getOrder)
+        c.execute('SELECT '+sheetData.getOrder()+', Points FROM '+gameName+' WHERE Day_ID = (SELECT MAX(Day_ID) FROM '+gameName+') ORDER BY '+sheetData.getOrder())
         row = 2
         for x in c.fetchall():
             #print(x)
@@ -56,17 +54,21 @@ def Sheet_Update(sheetData: SheetGame, conn: sqlite3.Connection):
             row += 1
         c.execute('SELECT MAX(Day_ID) FROM '+gameName)
         wks.update_cell(1,2,c.fetchone()[0])
-        Consol.Message('SHEET UPDATE '+gameName+': DONE')
+        Consol.Message('SHEET STATUS '+gameName+': DONE')
     except Exception as e:
-        Consol.Message('SHEET UPDATE '+gameName+': ERROR (' + str(e) +')')
+        Consol.Message('SHEET STATUS '+gameName+': ERROR (' + str(e) +')')
+
+def getGameName(sheetData: SheetGame, c: sqlite3.Cursor):
+    c.execute('SELECT Game_Name FROM GAMES WHERE Game_ID = ?',(str(sheetData.id)))
+    gameName = c.fetchone()[0]
+    return gameName
 
 def Sheet_Player_History(sheetData: SheetGame, conn: sqlite3.Connection):
     c = conn.cursor()
-    c.execute('SELECT Game_Name FROM Games WHERE Games_ID = '+sheetData.id+')')
-    gameName = c.fetchone
+    gameName = getGameName(sheetData, c)
     service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
     gc = gspread.authorize(service)
-    Consol.Message('START SHEET HISTORY UPDATE: '+gameName)
+    Consol.Message('START SHEET HISTORY '+gameName+': START')
     try:
         wks = gc.open(sheetData.history).sheet1
         c.execute('SELECT MAX(Day_ID) FROM '+gameName)
@@ -77,9 +79,9 @@ def Sheet_Player_History(sheetData: SheetGame, conn: sqlite3.Connection):
             Line += [x[0]]
         #print(Line)
         wks.append_row(Line)
-        Consol.Message('SHEET HISTORY UPDATE DONE: '+gameName)
+        Consol.Message('SHEET HISTORY '+gameName+': DONE')
     except Exception as e:
-        Consol.Message('SHEET HISTORY UPDATE '+gameName+': ERROR('+str(e)+')')
+        Consol.Message('SHEET HISTORY '+gameName+': ERROR('+str(e)+')')
 def Sheet_Server_run():
     try:
         Consol.Message('SHEET SERVER: ON')
