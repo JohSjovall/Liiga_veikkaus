@@ -49,6 +49,10 @@ def download_update_liiga(update):
         league_table = update_liiga_data(json_data)
     except EnvironmentError:
         Consol.Message("ERROR! NO CONNECT!")
+        return(False)
+    except ValueError:
+        Consol.Message("ERROR! JSON DATA NOT WORKING!")
+        return(False)
     for x in range(len(league_table)):
         c.execute("SELECT MAX(Games_Played) FROM "+str(league_table[x][0]))
         games_data = c.fetchone()
