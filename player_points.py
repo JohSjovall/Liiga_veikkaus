@@ -36,8 +36,6 @@ class Points:
         self.teams = []
         self.six_correct = 0
         self.top4_correct = 0
-        self.player = -1
-        self.game = -1
         self.total_points = 0
         self.player = player_value
         self.game = game_value
