@@ -14,8 +14,8 @@ def csv_read_test(dokument_name):
             teamList=[]
             miss = False
             tooMuch = []
-            missTemas = ['HPK', 'HIFK', 'ILVES', 'JUKURIT', 'JYP', 'KALPA', 'KARPAT', 'LUKKO', 'PELICANS', 'SAIPA', 'SPORT', 'TAPPARA', 'TPS', 'ASSAT', 'KOOKOO']
-            for x in range(5,20):
+            missTemas = ["HPK", "HIFK", "ILVES", "JUKURIT", "JYP", "KALPA", "KIEKKO-ESPOO", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
+            for x in range(5,21):
                 if line[x] in teamList:
                     tooMuch.append(line[x])
                     miss = True
@@ -38,7 +38,7 @@ def csv_read_test(dokument_name):
 def read_csv_dokument(dokument_name):
     conn = sqlite3.connect('Database_liiga_game.db')
     c = conn.cursor()
-    c.execute("SELECT Game_Name FROM GAMES WHERE Game_Name = '"+str(dokument_name.upper())+"'")
+    c.execute("SELECT Game_Name FROM GAMES WHERE Game_Name = ?", [str(dokument_name.upper())])
     IsNone = c.fetchone() == None
     if IsNone:
         c.execute("SELECT MAX(Player_ID) FROM PLAYERS")
@@ -63,8 +63,12 @@ def read_csv_dokument(dokument_name):
                     mail=line[1]
                 else:
                     mail=None
-                for x in range(5,20):
-                    guesses += ","+line[x]
+                for x in range(5,21):
+                    #fix team naming
+                    if line[x] == "KIEKKO-ESPOO":
+                        guesses += ",KESPOO"
+                    else:
+                        guesses += ","+line[x]
                 maxPID = make_player_and_guess(maxPID, maxGID, guesses, line[3:5],mail,c,conn)
         print("---------------------------------------------")
         Consol.Message("NEW PLAYER DATA ADD")
@@ -78,7 +82,7 @@ def read_csv_dokument(dokument_name):
         pass
     conn.close()
 def new_player_guess(pID, gID, data,c: sqlite3.Cursor,conn: sqlite3.Connection):
-    c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
+    c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16))
     conn.commit()
     print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME:"+str(gID)+" IS DONE")
     print("---------------------------------------------")
@@ -101,7 +105,7 @@ def make_player_and_guess(pID, gID, data,pName,mail,c: sqlite3.Cursor,conn: sqli
         c.execute("INSERT INTO PLAYERS (Player_ID, First_Name, Last_Name, Mail) VALUES (?,?,?,?)",(pID,pName[0].upper(),pName[1].upper(),mail))
         conn.commit()
         print("NEW PLAYER: "+pName[0].upper()+" "+pName[1].upper()+" ID NUMBER: "+str(pID)+" IS DONE")
-        c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
+        c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(pID,gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16))
         conn.commit()
         print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME:"+str(gID)+" IS DONE")
         return(pID+1)
@@ -111,7 +115,7 @@ def make_player_and_guess(pID, gID, data,pName,mail,c: sqlite3.Cursor,conn: sqli
             print("PLAYER "+pName[0].upper()+" "+pName[1].upper()+" IS REDEY IN THE GAME")
         else:
             print("PLAYER: "+pName[0].upper()+" "+pName[1].upper()+" IS REDY")
-            c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(playerID[0],gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
+            c.execute("INSERT INTO PLAYERS_GUESSES (Player_ID, Game_ID"+data+") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(playerID[0],gID,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16))
             conn.commit()
             print("NEW PLAYER GUESS PLAYER:"+str(pID)+" GAME: "+str(gID)+" IS DONE")
         return(pID)
