@@ -6,10 +6,11 @@ import Consol
 import configure
 import json
 import functools
+import helpper
 
 #league_table
-def create_league_table(c):
-    c.execute("CREATE TABLE IF NOT EXISTS LIIGA_LEAGUE_TABLE(Day_ID DATE PRIMARY KEY, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KESPOO INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
+def create_league_table():
+    helpper.make_liiga_table()
 #Liigakierros
 def make_liigakerros_data(day,c,conn):
     global league_table
@@ -30,18 +31,16 @@ def update_liigakierros_data(day,c,conn):
     c.execute("UPDATE LIIGA_LEAGUE_TABLE SET "+data+" WHERE Day_ID = ?",(1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16 ,day))
     conn.commit()
 #Liiga joukkue
-def create_Liiga_teams_tables(c,conn):
-    Teams = ["HPK", "HIFK", "ILVES", "JUKURIT", "JYP", "KALPA", "KESPOO", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
-    for x in Teams:
-        c.execute("CREATE TABLE IF NOT EXISTS "+x+" (Day_ID DATE, Games_Played INTEGER PRIMARY KEY, Wins INT, Draw INT, Losses INT, Overtime_Wins INT, Goals_For INT, Goals_Against INT, Points INT)")
-def make_liiga_team_data(day, data,c,conn):
+def create_Liiga_teams_tables():
+    helpper.make_teams_tables()
+def make_liiga_team_data(day, data):
+    c = helpper.connectDB()
     c.execute("INSERT INTO "+data[0]+"(Day_ID , Games_Played, Wins, Draw, Losses, Overtime_Wins, Goals_For, Goals_Against, Points) VALUES ( ?,?,?,?,?,?,?,?,?)", (day, data[1] , data[2] , data[3] , data[4] , data[5] , data[6] , data[7], data[8]))
-    conn.commit()
+    helpper.connect().commit()
+    helpper.disconnectDB()
 #Update teams and league table
 def download_update_liiga(update):
     global league_table
-    conn = sqlite3.connect('Database_liiga_game.db')
-    c = conn.cursor()
     try:
         response = urllib.request.urlopen(configure.URL)
         data = response.read().decode("utf-8")
@@ -54,18 +53,20 @@ def download_update_liiga(update):
         Consol.Message("ERROR! JSON DATA NOT WORKING!")
         return(False)
     for x in range(len(league_table)):
+        c = helpper.connectDB()
         c.execute("SELECT MAX(Games_Played) FROM "+str(league_table[x][0]))
         games_data = c.fetchone()
+        helpper.disconnectDB()
         if games_data is None or games_data[0] == league_table[x][1]:
             pass
         else:
             Consol.Message("NEW UPDATE")
-            team_data_updaet(c,conn)
+            team_data_updaet()
             league_table.clear()
             return(True)
     Consol.Message("NO UPDATE")
     league_table.clear()
-    conn.close()
+
     return(update)
 
 def team_data_updaet(c,conn):
@@ -140,8 +141,5 @@ def goalsDifference(a,b):
         return 1
 
 league_table = []
-con = sqlite3.connect('Database_liiga_game.db')
-cv = con.cursor()
-create_league_table(cv)
-create_Liiga_teams_tables(cv,con)
-con.close()
+create_league_table()
+create_Liiga_teams_tables()
