@@ -9,14 +9,14 @@ import functools
 
 #league_table
 def create_league_table(c):
-    c.execute("CREATE TABLE IF NOT EXISTS LIIGA_LEAGUE_TABLE(Day_ID DATE PRIMARY KEY, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
+    c.execute("CREATE TABLE IF NOT EXISTS LIIGA_LEAGUE_TABLE(Day_ID DATE PRIMARY KEY, HPK INT, HIFK INT, ILVES INT, JUKURIT INT, JYP INT, KALPA INT, KESPOO INT, KOOKOO INT, KARPAT INT, LUKKO INT, PELICANS INT, SAIPA INT, SPORT INT, TAPPARA INT, TPS INT, ASSAT INT)")
 #Liigakierros
 def make_liigakerros_data(day,c,conn):
     global league_table
     data = "Day_ID"
     for x in range(len(league_table)):
         data = data+", "+league_table[x][0]
-    c.execute("INSERT INTO LIIGA_LEAGUE_TABLE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15))
+    c.execute("INSERT INTO LIIGA_LEAGUE_TABLE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16))
     conn.commit()
 def update_liigakierros_data(day,c,conn):
     global league_table
@@ -27,11 +27,11 @@ def update_liigakierros_data(day,c,conn):
             data=data+" ,"
         else:
             pass
-    c.execute("UPDATE LIIGA_LEAGUE_TABLE SET "+data+" WHERE Day_ID = ?",(1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15,day))
+    c.execute("UPDATE LIIGA_LEAGUE_TABLE SET "+data+" WHERE Day_ID = ?",(1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16 ,day))
     conn.commit()
 #Liiga joukkue
 def create_Liiga_teams_tables(c,conn):
-    Teams = ["HPK", "HIFK", "ILVES", "JUKURIT", "JYP", "KALPA", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
+    Teams = ["HPK", "HIFK", "ILVES", "JUKURIT", "JYP", "KALPA", "KESPOO", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
     for x in Teams:
         c.execute("CREATE TABLE IF NOT EXISTS "+x+" (Day_ID DATE, Games_Played INTEGER PRIMARY KEY, Wins INT, Draw INT, Losses INT, Overtime_Wins INT, Goals_For INT, Goals_Against INT, Points INT)")
 def make_liiga_team_data(day, data,c,conn):
@@ -94,7 +94,7 @@ def update_liiga_data(data):
     teams = configure.TEAMS
     temp_league_table = [[]] * 15
     season = data['season']
-    for i in range(0,15):
+    for i in range(0,16):
         team = season[i]
         temp_league_table[i] = [teams[str(team['teamId'])]] #Team name
         temp_league_table[i].append(int(team['games'])) #Games_Played
