@@ -1,9 +1,13 @@
 class Team:
     position = 0
     def __init__(self, position: int, guess: int):
+        self.name = ""
         self.position = position
         self.guess = guess
         self.points = 0
+    
+    def set_team_name(self, name):
+        self.name = name
 
     def get_name(self):
         return self.name
@@ -28,9 +32,15 @@ class Team:
     
     def get_guess(self):
         return self.guess
+    
+    def __repr__(self):
+        return repr((self.name, 
+                     self.guess,
+                     self.position,
+                     self.points))
 
 
-class Points:
+class Player_Points:
 
     def __init__(self, player_value, game_value):
         self.teams = []
@@ -104,3 +114,63 @@ class Points:
         if self.six_correct > 5:
             return 1
         return 0
+    
+class Player_Data:
+
+    def __init__(self, player_id, game_id, email, first_name, last_name, game_name):
+        self.teams = []
+        self.six_correct = 0
+        self.top4_correct = 0
+        self.total_points = 0
+        self.player_id = player_id
+        self.player_email = email
+        self.player_position = 0
+        self.player_shared_place = False
+        self.player_first_name = first_name
+        self.player_last_name = last_name
+        self.game_id = game_id
+        self.game_name = game_name
+        self.date = ""
+    
+    def set_teams_data(self, guess_lis: list, position_list: list, name_list: list, points_list: list):
+        for index in range(len(guess_lis)):
+            self.set_team_data(position_list[index] ,guess_lis[index], name_list[index], points_list[index])
+
+    def set_team_data(self, position ,guess, name, points):
+        team = Team(position, guess)
+        team.set_team_name(name)
+        team.add_points(points)
+        self.teams.append(team)
+    
+    def set_six_correct(self, points):
+        self.six_correct = points
+    
+    def set_top4_correct(self, points):
+        self.top4_correct = points
+    
+    def set_player_name(self, first_name, last_name):
+        self.player_first_name = first_name
+        self.player_last_name = last_name
+    
+    def set_game_name(self, game_name):
+        self.game_name = game_name
+    
+    def set_date(self, date):
+        self.date = date
+    
+    def set_total_points(self, points):
+        self.total_points = points
+    
+    def __repr__(self):
+        return repr((self.player_id, 
+                     self.game_id, 
+                     self.player_email,
+                     self.player_first_name,
+                     self.player_last_name,
+                     self.player_position,
+                     self.player_shared_place,
+                     self.teams,
+                     self.top4_correct,
+                     self.six_correct,
+                     self.total_points,
+                     self.date))
