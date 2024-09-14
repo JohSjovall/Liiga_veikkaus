@@ -12,14 +12,16 @@ import helpper
 def create_league_table():
     helpper.make_liiga_table()
 #Liigakierros
-def make_liigakerros_data(day,c,conn):
+def make_liigakerros_data(day):
     global league_table
     data = "Day_ID"
     for x in range(len(league_table)):
         data = data+", "+league_table[x][0]
+    c = helpper.connectDB()
     c.execute("INSERT INTO LIIGA_LEAGUE_TABLE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16))
-    conn.commit()
-def update_liigakierros_data(day,c,conn):
+    helpper.connect().commit()
+    helpper.disconnectDB()
+def update_liigakierros_data(day):
     global league_table
     data = ""
     for x in range(len(league_table)):
@@ -28,8 +30,10 @@ def update_liigakierros_data(day,c,conn):
             data=data+" ,"
         else:
             pass
+    c = helpper.connectDB()
     c.execute("UPDATE LIIGA_LEAGUE_TABLE SET "+data+" WHERE Day_ID = ?",(1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16 ,day))
-    conn.commit()
+    helpper.connect().commit()
+    helpper.disconnectDB()
 #Liiga joukkue
 def create_Liiga_teams_tables():
     helpper.make_teams_tables()
@@ -69,7 +73,7 @@ def download_update_liiga(update):
 
     return(update)
 
-def team_data_updaet(c,conn):
+def team_data_updaet():
     global league_table
     TIME = datetime.date.today()
     for x in range(len(league_table)):
@@ -78,14 +82,16 @@ def team_data_updaet(c,conn):
             Consol.Message("NEW DATA "+league_table[x][0]+" DONE")
         except:
             pass
+    c = helpper.connectDB()
     c.execute("SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE")
     MaxDay = c.fetchone()[0]
+    helpper.disconnectDB()
     try:
         if MaxDay is not None and str(MaxDay) == str(TIME):
-            update_liigakierros_data(TIME,c,conn)
+            update_liigakierros_data(TIME)
             Consol.Message("UPDATE LIIGA LEAGUE TABLE DONE")
         else:
-            make_liigakerros_data(TIME,c,conn)
+            make_liigakerros_data(TIME)
             Consol.Message("NEW DATA LIIGA LEAGUE TABLE DONE")
     except Exception as e:
         Consol.Message("ERROR UPDATE LIIGA LEAGUE TABLE: "+str(e))
