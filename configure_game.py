@@ -78,7 +78,7 @@ def team_data_updaet():
     TIME = datetime.date.today()
     for x in range(len(league_table)):
         try:
-            make_liiga_team_data(TIME, league_table[x],c,conn)
+            make_liiga_team_data(TIME, league_table[x])
             Consol.Message("NEW DATA "+league_table[x][0]+" DONE")
         except:
             pass
@@ -99,7 +99,7 @@ def team_data_updaet():
 def update_liiga_data(data):
     global league_table
     teams = configure.TEAMS
-    temp_league_table = [[]] * 15
+    temp_league_table = [[]] * 16
     season = data['season']
     for i in range(0,16):
         team = season[i]
