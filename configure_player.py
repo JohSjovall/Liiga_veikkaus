@@ -12,7 +12,7 @@ def create_games_tables():
     helpper.disconnectDB()
     for game in gamesList:
         c = helpper.connectDB()
-        c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name, Last_Name, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
+        c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID INTEGER REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name TEXT, Last_Name TEXT, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
         helpper.disconnectDB()
 
 def update_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
@@ -27,8 +27,8 @@ def make_players_points(): #piste systemi eroteltava omiin metodeihin
     day = datetime.date.today()
     c = helpper.connectDB()
     c.execute("SELECT "+team_list+" FROM LIIGA_LEAGUE_TABLE WHERE Day_ID = (SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE)")
-    helpper.disconnectDB()
     league_table = c.fetchone()
+    helpper.disconnectDB()
     c = helpper.connectDB()
     c.execute("SELECT Player_ID, Game_ID, "+team_list+" FROM PLAYERS_GUESSES")
     players_guesses = c.fetchall()
@@ -72,8 +72,10 @@ def make_game_tabel_data():
         try:
             if len(playersData)>=2:
                 pointMember = playersData[1][4]
+                c = helpper.connectDB()
                 c.execute("SELECT MAX(Day_ID) FROM "+str(game[1]))
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
+                helpper.disconnectDB()
                 counter = 0
                 for player in playersData:
                     if player[4] == pointMember:
@@ -104,8 +106,10 @@ def make_game_tabel_data():
             else:
                 playersData[0] += (1,)
                 playersData[0] += (0,)
+                c = helpper.connectDB()
                 c.execute("SELECT MAX(Day_ID) FROM "+str(game[1]))
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
+                helpper.disconnectDB()
                 if maxDay:
                     update_game_data(day,game[1],player,c,conn)
                 else:
@@ -118,5 +122,5 @@ def make_updates():
     make_players_points()
     make_game_tabel_data()
 
-helpper.make_player_and_team_tabels
+helpper.make_player_and_team_tabels()
 create_games_tables()
