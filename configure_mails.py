@@ -76,13 +76,13 @@ def make_players_guesses_table_order(PlayerGame):
 def get_player_guesses_list(PlayerId, GameId):
     c = helpper.connectDB()
     c.execute("SELECT "+teams_list+" FROM PLAYERS_GUESSES WHERE Player_ID = ? AND Game_ID = ?",(PlayerId, GameId))
-    data = c.fetchall()
+    data = c.fetchone()
     helpper.disconnectDB()
     return data
 def get_player_guesses_points(PlayerId, GameId):
     c = helpper.connectDB()
     c.execute("SELECT Points, Six_Correct_Point, top4_Correct_Point, "+teams_list+" FROM PLAYERS_POINTS WHERE Player_ID = ? AND Game_ID = ? AND Day_ID = (SELECT MAX(Day_ID) FROM PLAYERS_POINTS)",(PlayerId, GameId))
-    data = c.fetchall()
+    data = c.fetchone()
     helpper.disconnectDB()
     return data
 def make_Player_statistics(PlayerGame):
@@ -129,9 +129,9 @@ def place_change(name, player_id):
         helpper.disconnectDB()
         return '&nbsp;&#9472;&nbsp;'
 def get_player_Shared_Place_and_Place_and_Day_ID(name,player_id):
-    c = helpper.disconnectDB()
+    c = helpper.connectDB()
     c.execute("SELECT Shared_Place, Place, Day_ID FROM "+str(name)+" WHERE Day_ID = (SELECT MAX(Day_ID) FROM "+str(name)+" ) AND Player_ID = "+str(player_id))
-    data = c.fetchall()
+    data = c.fetchone()
     helpper.disconnectDB()
     return(data)
 def get_game_name(game_id):
@@ -139,15 +139,15 @@ def get_game_name(game_id):
     c.execute("SELECT Game_Name FROM GAMES WHERE Game_ID = ?",(game_id,))
     return c.fetchone()[0]
 def get_player_name(player_id):
-    c = helpper.disconnectDB()
+    c = helpper.connectDB()
     c.execute("SELECT First_Name, Last_Name FROM PLAYERS WHERE Player_ID = ?",(player_id,))
     data = c.fetchall()
     helpper.disconnectDB()
     return(data)
 def getPlayerData():
     league_table = make_liiga_league_table_order()
-    c = helpper.disconnectDB()
-    c.executr("SELECT PLAYERS.Player_ID, PLAYERS_GUESSES.Game_ID, PLAYERS.Mail, PLAYERS.First_Name, PLAYERS.Last_Name, GAMES.Game_Name FROM PLAYERS_GUESSES LEFT JOIN PLAYERS ON PLAYERS.Player_ID = PLAYERS_GUESSES.Player_ID LEFT JOIN GAMES ON GAMES.Game_ID = PLAYERS_GUESSES.Game_ID WHERE PLAYERS.Mail IS NOT NULL")
+    c = helpper.connectDB()
+    c.execute("SELECT PLAYERS.Player_ID, PLAYERS_GUESSES.Game_ID, PLAYERS.Mail, PLAYERS.First_Name, PLAYERS.Last_Name, GAMES.Game_Name FROM PLAYERS_GUESSES LEFT JOIN PLAYERS ON PLAYERS.Player_ID = PLAYERS_GUESSES.Player_ID LEFT JOIN GAMES ON GAMES.Game_ID = PLAYERS_GUESSES.Game_ID WHERE PLAYERS.Mail IS NOT NULL")
     data = c.fetchall()
     helpper.disconnectDB()
     for playerData in data:
@@ -183,7 +183,7 @@ def make_messages(c):
         h3 = '<h3>RUNKOSARJA JA VEIKKAUKSESI: '+str(day)+'</h3>'
         for z in range(16):
             table2 += '\n<tr>\n<td>'+str(z+1)+'.</td>\n<td>'+league_table[z]+'</td>\n<td>'+pPoints[z][0]+'</td>\n<td>'+str(pPoints[z][1])+'</td>\n</tr>'
-        for row in make_Player_statistics(x,c):
+        for row in make_Player_statistics(x):
             table3 += '\n<tr>\n<td>'+str(row[0])+'</td>\n<td align:"center">'+str(row[1])+'</td>\n<td>'+str(row[2])+'</td>\n<td>'+str(row[3])+'</td>\n<td>'+str(row[4])+'</td>\n<td>'+str(row[5])+'</td>\n<td>'+str(row[6])+'</td>\n<td>'+str(row[7])+'</td>\n<td>'+str(row[8])+'</td>\n<td>'+str(row[9])+'</td>\n<td>'+str(row[10])+'</td>\n<td>'+str(row[11])+'</td>\n<td>'+str(row[12])+'</td>\n<td>'+str(row[13])+'</td>\n<td>'+str(row[14])+'</td>\n<td>'+str(row[15])+'</td>\n<td>'+str(row[16])+'</td>\n<td>'+str(row[17])+'</td>\n</tr>'
         message = '''
 <html>
@@ -279,11 +279,11 @@ text-align: left;
 def send_mail_players_and_admin():
     Consol.Message('PLAYERS MAILS SENDIN')
     try:
-        make_messages(c)
+        make_messages()
     except:
         Consol.Message('ERROR: PLAYERS MAILS SENDIN FAILL')
     Consol.Message('ADMIN MAILS SENDIN')
     try:
-        make_admin_messages(c)
+        make_admin_messages()
     except:
         Consol.Message('ERROR: ADMINS MAILS SENDIN FAILL')

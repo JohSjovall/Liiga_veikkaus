@@ -15,13 +15,17 @@ def create_games_tables():
         c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID INTEGER REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name TEXT, Last_Name TEXT, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
         helpper.disconnectDB()
 
-def update_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
+def update_game_data(day, name, data):
+    c = helpper.connectDB() #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
     c.execute("UPDATE "+str(name)+" SET Day_ID = ?, Player_ID = ?, First_Name = ?, Last_Name = ?, Points = ?, Place = ?, Shared_Place = ? WHERE Day_ID = ? AND Player_ID = ?", (day,data[1],data[2],data[3],data[4],data[5],data[6],day,data[1]))
-    conn.commit()
+    helpper.connect().commit()
+    helpper.disconnectDB()
 
-def make_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
+def make_game_data(day, name, data): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
+    c = helpper.connectDB()
     c.execute("INSERT INTO "+name+" (Day_ID, Player_ID, First_Name, Last_Name, Points, Place, Shared_Place) VALUES (?,?,?,?,?,?,?)",(day,data[1],data[2],data[3],data[4],data[5],data[6]))
-    conn.commit()
+    helpper.connect().commit()
+    helpper.disconnectDB()
 
 def make_players_points(): #piste systemi eroteltava omiin metodeihin
     day = datetime.date.today()
@@ -96,10 +100,10 @@ def make_game_tabel_data():
                         place += 1
                         pointMember = player[4]
                     if maxDay == True:
-                        update_game_data(day,game[1],player,c,conn)
+                        update_game_data(day,game[1],player)
                         Consol.Message("GAME "+str(game[1])+" UPDATE PLAYER "+str(player[1])+" DATA")
                     if maxDay == False:
-                        make_game_data(day,game[1],player,c,conn)
+                        make_game_data(day,game[1],player)
                         Consol.Message("GAME "+str(game[1])+" ADD PLAYER "+str(player[1])+" DATA")
                     counter += 1
                 Consol.Message("GAME "+game[1]+" TABEL IS UPDATED")
@@ -111,9 +115,9 @@ def make_game_tabel_data():
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
                 helpper.disconnectDB()
                 if maxDay:
-                    update_game_data(day,game[1],player,c,conn)
+                    update_game_data(day,game[1],player)
                 else:
-                    make_game_data(day,game[1],player,c,conn)
+                    make_game_data(day,game[1],player)
                 Consol.Message("GAME "+str(game[1])+" TABEL IS UPDATED")
         except:
             Consol.Message("GAME "+str(game[1])+" TABEL UPDATED FAILL")
