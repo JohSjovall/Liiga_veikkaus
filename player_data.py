@@ -1,10 +1,9 @@
 class Team:
-    position = 0
     def __init__(self, position: int, guess: int):
-        self.name = ""
-        self.position = position
-        self.guess = guess
-        self.points = 0
+        self.name: str = ""
+        self.position: int = position
+        self.guess: int = guess
+        self.points: int = 0
     
     def set_team_name(self, name):
         self.name = name
@@ -44,11 +43,11 @@ class Player_Points:
 
     def __init__(self, player_value, game_value):
         self.teams = []
-        self.six_correct = 0
-        self.top4_correct = 0
-        self.total_points = 0
-        self.player = player_value
-        self.game = game_value
+        self.six_correct: int = 0
+        self.top4_correct: int = 0
+        self.total_points: int = 0
+        self.player: int = player_value
+        self.game: int = game_value
     
     def cout_points(self, guess_lis: list, position_list: list):
         for index in range(len(guess_lis)):
@@ -115,18 +114,18 @@ class Player_Data:
 
     def __init__(self, player_id, game_id, email, first_name, last_name, game_name):
         self.teams = []
-        self.six_correct = 0
-        self.top4_correct = 0
-        self.total_points = 0
-        self.player_id = player_id
-        self.player_email = email
-        self.player_position = 0
-        self.player_shared_place = False
-        self.player_first_name = first_name
-        self.player_last_name = last_name
-        self.game_id = game_id
-        self.game_name = game_name
-        self.date = ""
+        self.six_correct: int = 0
+        self.top4_correct: int = 0
+        self.total_points: int = 0
+        self.player_id: int = player_id
+        self.player_email: str = email
+        self.player_position: int = 0
+        self.player_shared_place: bool = False
+        self.player_first_name: str = first_name
+        self.player_last_name: str = last_name
+        self.game_id: int = game_id
+        self.game_name: str = game_name
+        self.date: str = ""
     
     def set_teams_data(self, guess_lis: list, position_list: list, name_list: list, points_list: list):
         for index in range(len(guess_lis)):
