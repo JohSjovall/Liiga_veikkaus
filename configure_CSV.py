@@ -72,7 +72,7 @@ def read_csv_dokument(dokument_name):
                 maxPID = make_player_and_guess(maxPID, maxGID, guesses, line[3:5],mail,c,conn)
         print("---------------------------------------------")
         Consol.Message("NEW PLAYER DATA ADD")
-        con_player.create_games_tables(c)
+        con_player.create_games_tables()
         #con_player.make_updates()
         print("---------------------------------------------")
         sheet_options(maxGID, c, conn)
