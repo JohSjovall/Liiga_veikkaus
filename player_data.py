@@ -33,10 +33,7 @@ class Team:
         return self.guess
     
     def __repr__(self):
-        return repr((self.name, 
-                     self.guess,
-                     self.position,
-                     self.points))
+        return repr((self.name, self.guess, self.position, self.points))
 
 
 class Player_Points:
@@ -130,14 +127,6 @@ class Player_Data:
     def set_teams_data(self, guess_lis: list, position_list: list, name_list: list, points_list: list):
         for index in range(len(guess_lis)):
             self.set_team_data(position_list[index] ,guess_lis[index], name_list[index], points_list[index])
-            position = position_list[index]
-            guess = guess_lis[index]
-            name = name_list[index]
-            points = points_list[index]
-            team = Team(position, guess)
-            team.set_team_name(name)
-            team.add_points(points)
-            self.teams.append(team)
 
     def set_team_data(self, position ,guess, name, points):
         team = Team(position, guess)
@@ -157,6 +146,12 @@ class Player_Data:
     
     def set_game_name(self, game_name):
         self.game_name = game_name
+    
+    def set_position(self, position):
+        self.player_position = position
+
+    def set_shared_place(self, shared_place: bool):
+        self.player_shared_place = shared_place
     
     def set_date(self, date):
         self.date = date
