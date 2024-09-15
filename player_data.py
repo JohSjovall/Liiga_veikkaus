@@ -172,3 +172,16 @@ class Player_Data:
                      self.six_correct,
                      self.total_points,
                      self.date))
+
+class Player_history_round:
+    def __init__(self, data: list):
+        self.teams = []
+        self.six_correct: int = data[2]
+        self.top4_correct: int = data[3]
+        self.total_points: int = data[1]
+        self.date: str = data[0]
+        for points in range(4,len(data)):
+            self.teams.append(History_Team(data[points]))
+class History_Team:
+    def __init__(self, points):
+        self.points = points
