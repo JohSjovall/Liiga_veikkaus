@@ -147,7 +147,7 @@ def get_player_name(player_id):
     data = c.fetchall()
     helpper.disconnectDB()
     return(data)
-def getPlayerData():
+def do_players_subscription_messages():
     league_table = make_liiga_league_table_order()
     c = helpper.connectDB()
     c.execute("SELECT PLAYERS.Player_ID, PLAYERS_GUESSES.Game_ID, PLAYERS.Mail, PLAYERS.First_Name, PLAYERS.Last_Name, GAMES.Game_Name FROM PLAYERS_GUESSES LEFT JOIN PLAYERS ON PLAYERS.Player_ID = PLAYERS_GUESSES.Player_ID LEFT JOIN GAMES ON GAMES.Game_ID = PLAYERS_GUESSES.Game_ID WHERE PLAYERS.Mail IS NOT NULL")
