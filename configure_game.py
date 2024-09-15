@@ -45,6 +45,8 @@ def make_liiga_team_data(day, data):
 #Update teams and league table
 def download_update_liiga(update):
     global league_table
+    update = False
+    TIME = datetime.date.today()
     try:
         response = urllib.request.urlopen(configure.URL)
         data = response.read().decode("utf-8")
@@ -56,6 +58,7 @@ def download_update_liiga(update):
     except ValueError:
         Consol.Message("ERROR! JSON DATA NOT WORKING!")
         return(False)
+    Consol.Message("CHEKING DATA...")
     for x in range(len(league_table)):
         c = helpper.connectDB()
         c.execute("SELECT MAX(Games_Played) FROM "+str(league_table[x][0]))
@@ -64,24 +67,18 @@ def download_update_liiga(update):
         if games_data is None or games_data[0] == league_table[x][1]:
             pass
         else:
-            Consol.Message("NEW UPDATE")
-            team_data_updaet()
-            league_table.clear()
-            return(True)
-    Consol.Message("NO UPDATE")
+            make_liiga_team_data(TIME, league_table[x])
+            Consol.Message("NEW DATA "+league_table[x][0]+" DONE")
+            update = True
+    if update:
+        league_data_updaet(TIME)
+    Consol.Message("UPDATE DONE")
     league_table.clear()
 
     return(update)
 
-def team_data_updaet():
+def league_data_updaet(TIME):
     global league_table
-    TIME = datetime.date.today()
-    for x in range(len(league_table)):
-        try:
-            make_liiga_team_data(TIME, league_table[x])
-            Consol.Message("NEW DATA "+league_table[x][0]+" DONE")
-        except:
-            pass
     c = helpper.connectDB()
     c.execute("SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE")
     MaxDay = c.fetchone()[0]
