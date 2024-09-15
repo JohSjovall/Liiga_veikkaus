@@ -258,84 +258,6 @@ def player_history_table(player: Player_Data):
     history_table += '\n</table>'
     return history_table
 
-
-
-def make_messages():
-    league_table = make_liiga_league_table_order()
-    c = helpper.connectDB()
-    c.execute("SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE")
-    day = c.fetchone()[0]
-    helpper.disconnectDB()
-    for x in make_players_list(c):
-        pName = get_player_name(x[0],c)
-        gName = get_game_name(x[1],c)
-        sp_pl_di = get_player_Shared_Place_and_Place_and_Day_ID(gName, x[0],c)
-        pPoints = make_players_guesses_table_order(x,c)
-        head = '<p>Hei <b>'+pName[0]+'</b></p>'
-        if sp_pl_di[0]==1:
-            head += '\n<p>Olet <b>'+gName+'</b> pelissa jaetulla sijalla <b>'+str(sp_pl_di[1])+'</b></p>'
-        else:
-            head += '\n<p>Olet <b>'+gName+'</b> pelissa sijalla <b>'+str(sp_pl_di[1])+'</b></p>'
-        table2 = ''
-        table3 = ''
-        h4 = '\n<p>KUUSI OIKEIN PISTE: '+str(pPoints[15][1])+'</p>'
-        h2 = '\n<p>KOKONAISPISTEET: <b>'+str(pPoints[16][1])+'</b></p>'
-        h3 = '<h3>RUNKOSARJA JA VEIKKAUKSESI: '+str(day)+'</h3>'
-        for z in range(16):
-            table2 += '\n<tr>\n<td>'+str(z+1)+'.</td>\n<td>'+league_table[z]+'</td>\n<td>'+pPoints[z][0]+'</td>\n<td>'+str(pPoints[z][1])+'</td>\n</tr>'
-        for row in make_Player_statistics(x):
-            table3 += '\n<tr>\n<td>'+str(row[0])+'</td>\n<td align:"center">'+str(row[1])+'</td>\n<td>'+str(row[2])+'</td>\n<td>'+str(row[3])+'</td>\n<td>'+str(row[4])+'</td>\n<td>'+str(row[5])+'</td>\n<td>'+str(row[6])+'</td>\n<td>'+str(row[7])+'</td>\n<td>'+str(row[8])+'</td>\n<td>'+str(row[9])+'</td>\n<td>'+str(row[10])+'</td>\n<td>'+str(row[11])+'</td>\n<td>'+str(row[12])+'</td>\n<td>'+str(row[13])+'</td>\n<td>'+str(row[14])+'</td>\n<td>'+str(row[15])+'</td>\n<td>'+str(row[16])+'</td>\n<td>'+str(row[17])+'</td>\n</tr>'
-        message = '''
-<html>
-<body>
-<style>
-table, th, td {
-border: 1px solid black;
-border-collapse: collapse;
-}
-th {
-text-align: left;
-}
-</style>
-<font face="Arial">'''+head+'''
-<p> </p>
-'''+h3+'''<table style="width:25%">
-<tr align="left">
-<th>SIJOITUS</th>
-<th>RUNKOSARJA</th>
-<th>VEIKKAUKSESI</th>
-<th>PISTEET</th>
-</tr>'''+table2+'''</table>
-'''+h4+h2+'''
-<p> </p>
-<h3>HISTORIASI</h3>
-<table table style="width:80%">
-<tr align="left">
-<th>PAIVAMAARA</th>
-<th>HPK</th>
-<th>HIFK</th>
-<th>ILVES</th>
-<th>JUKURIT</th>
-<th>JYP</th>
-<th>KALPA</th>
-<th>KOOKOO</th>
-<th>KARPAT</th>
-<th>LUKKO</th>
-<th>PELICANS</th>
-<th>SAIPA</th>
-<th>SPORT</th>
-<th>TAPPARA</th>
-<th>TPS</th>
-<th>ASSAT</th>
-<th>KUUSI_OIKEIN</th>
-<th>KOKONAISPISTEET</th>
-</tr>'''+table3+'''
-</table>
-</font>
-</body>
-</html>'''
-        subject = "LIIGAVEIKKAUS PELI "+gName+" "+day
-        send_mail(x[2],subject,message)
 def make_admin_messages(c):
     c.execute("SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE")
     day = c.fetchone()[0]
@@ -379,7 +301,7 @@ text-align: left;
 def send_mail_players_and_admin():
     Consol.Message('PLAYERS MAILS SENDIN')
     try:
-        make_messages()
+        do_players_subscription_messages()
     except:
         Consol.Message('ERROR: PLAYERS MAILS SENDIN FAILL')
     Consol.Message('ADMIN MAILS SENDIN')
