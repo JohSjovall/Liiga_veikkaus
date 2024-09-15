@@ -49,9 +49,24 @@ class Player_Points:
         self.total_points = 0
         self.player = player_value
         self.game = game_value
+    
+    def cout_points(self, guess_lis: list, position_list: list):
+        for index in range(len(guess_lis)):
+            self.set_points_at_team(position_list[index], guess_lis[index])
 
+    def set_points_at_team(self, position, guess):
+        team = Team(position, guess)
+        team.add_points(self.get_position_poits(team))
+        team.add_points(self.get_location_poits(team))
+        self.total_points += team.get_points()
+        self.teams.append(team)
+        if team.get_guess() < 5 and team.isCorrect(): # top4
+            self.top4_correct += 1
+        if team.isCorrect():
+            self.six_correct += 1
+    
     def get_position_poits(self, team: Team):
-        return 4 - abs(team.get_guess - team.get_position)
+            return 4 - abs(team.get_guess() - team.get_position())
 
     def get_location_poits(self, team: Team):
         points = 0
@@ -73,24 +88,6 @@ class Player_Points:
                 points += 1
         return points
 
-    def set_extra_poitns(self, team: Team):
-        if team.get_guess() < 5 and team.isCorrect(): # top4
-            self.top4_correct += 1
-        if team.isCorrect():
-            self.six_correct += 1
-    
-    def cout_points(self, guess_lis: list, position_list: list):
-        for index in range(len(guess_lis)):
-            self.set_points_at_team(position_list[index] ,guess_lis[index])
-
-    def set_points_at_team(self, position, guess):
-        team = Team(position, guess)
-        team.add_points(self.get_position_poits(team))
-        team.add_points(self.get_location_poits(team))
-        self.set_extra_poitns(team)
-        self.total_points += team.get_points()
-        self.teams.append(team)
-
 
     def get_player(self):
         return self.player
@@ -99,8 +96,7 @@ class Player_Points:
         return self.game
 
     def get_team_points(self, index):
-        global teams
-        team: Team = teams[index]
+        team: Team = self.teams[index]
         return team.get_points()
 
     def get_total_points(self):
@@ -135,6 +131,14 @@ class Player_Data:
     def set_teams_data(self, guess_lis: list, position_list: list, name_list: list, points_list: list):
         for index in range(len(guess_lis)):
             self.set_team_data(position_list[index] ,guess_lis[index], name_list[index], points_list[index])
+            position = position_list[index]
+            guess = guess_lis[index]
+            name = name_list[index]
+            points = points_list[index]
+            team = Team(position, guess)
+            team.set_team_name(name)
+            team.add_points(points)
+            self.teams.append(team)
 
     def set_team_data(self, position ,guess, name, points):
         team = Team(position, guess)
