@@ -12,6 +12,8 @@ from player_data import Player_Data
 from player_data import Team
 from player_data import Player_history_round
 from player_data import History_Team
+from player_data import Admin_Contacts
+from player_data import Player_Game_Status
 
 def send_mail(to, subject, html):    
     try:
@@ -52,11 +54,21 @@ def make_players_list():
     return data
 
 def make_admin_list():
+    admin_data = []
     c = helpper.connectDB()
-    c.execute("SELECT Mail, Games_ID FROM ADMINS WHERE Mail IS NOT NULL")
+    c.execute("SELECT Admin_ID, Mail FROM ADMINS WHERE Mail IS NOT NULL")
     data = c.fetchall()
     helpper.disconnectDB()
-    return data
+    for row in data:
+        admin = Admin_Contacts(row[0], row[1])
+        c = helpper.connectDB()
+        c.execute("SELECT GAMES.Game_Name FROM ADMINS_GAMES LEFT JOIN GAMES ON GAMES.Game_ID = ADMINS_GAMES.Game_ID WHERE Admin_ID = ?",(admin.admin_id,))
+        gamesdata = c.fetchall()
+        helpper.disconnectDB()
+        for row in gamesdata:
+            admin.add_game_name(row[0])
+        admin_data.append(admin)
+    return admin_data
 
 def make_players_guesses_table_order(PlayerGame):
     c = helpper.connectDB()
@@ -94,59 +106,58 @@ def make_Player_statistics(player_id, game_id):
     data = c.fetchall()
     helpper.disconnectDB()
     return(data)
-def make_game_table_order(name):
+def players_game_table_data(game_name):
+    players_list = []
     c = helpper.connectDB()
-    c.execute("SELECT Place, Points, First_Name, Last_Name, Day_ID, Player_ID FROM "+name+" WHERE Day_ID = (SELECT MAX(Day_ID) FROM "+name+") ORDER BY Points DESC")
+    c.execute("SELECT First_Name, Last_Name, Place, Shared_Place, Points, Player_ID FROM "+game_name+" WHERE Day_ID = (SELECT MAX(Day_ID) FROM "+game_name+") ORDER BY Points DESC")
     data = c.fetchall()
     helpper.disconnectDB()
-    return data
-def points_change(name, player_id):
-    c = helpper.connectDB()
-    c.execute("SELECT Points FROM "+name+" WHERE Player_ID = "+str(player_id)+" ORDER BY Day_ID DESC")
-    first = c.fetchone()[0]
-    try:
-        second = c.fetchone()[0]
-    except:
-        second = first
-    if first >= second:
+    for row in data:
+        player = Player_Game_Status(row[0], row[1], row[2], bool(row[3]), row[4])
+        c = helpper.connectDB()
+        c.execute("SELECT Place, Points FROM "+game_name+" WHERE Player_ID = ? AND Day_ID IS NOT (SELECT MAX(Day_ID) FROM "+game_name+") ORDER BY Day_ID DESC LIMIT 1", (row[5],))
+        history = c.fetchone()
         helpper.disconnectDB()
-        return '+'+str(first-second)
+        if history != None:
+            player.set_position_change(int(history[0]))
+            player.set_points_change(int(history[1]))
+        players_list.append(player)
+    return sorted(players_list, key=lambda player:player.position)
+
+def points_change(points_change):
+    if points_change == 0:
+        return ' '
+    if points_change > 0:
+        return '+'+str(points_change) 
+    return str(points_change)
+
+def place_change(place_change):
+    if place_change > 0:
+        return '&nbsp;&#8896; '+str(place_change)#arrow up
+    elif place_change < 0:
+        return '&nbsp;&#8897; '+str(place_change)#arrow down
     else:
-        helpper.disconnectDB()
-        return str(first-second)
-def place_change(name, player_id):
-    c = helpper.connectDB()
-    c.execute("SELECT Place FROM "+name+" WHERE Player_ID = "+str(player_id)+" ORDER BY Day_ID DESC")
-    first = c.fetchone()[0]
-    try:
-        second = c.fetchone()[0]
-    except:
-        second = first
-    if first < second:
-        helpper.disconnectDB()
-        return '&nbsp;&#8896; '+str(abs(first-second))#arrow up
-    elif first > second:
-        helpper.disconnectDB()
-        return '&nbsp;&#8897; '+str(abs(first-second))#arrow down
-    else:
-        helpper.disconnectDB()
         return '&nbsp;&#9472;&nbsp;'
+
 def get_player_Shared_Place_and_Place_and_Day_ID(name,player_id):
     c = helpper.connectDB()
     c.execute("SELECT Shared_Place, Place, Day_ID FROM "+str(name)+" WHERE Day_ID = (SELECT MAX(Day_ID) FROM "+str(name)+" ) AND Player_ID = "+str(player_id))
     data = c.fetchone()
     helpper.disconnectDB()
     return(data)
+
 def get_game_name(game_id):
     c = helpper.disconnectDB()
     c.execute("SELECT Game_Name FROM GAMES WHERE Game_ID = ?",(game_id,))
     return c.fetchone()[0]
+
 def get_player_name(player_id):
     c = helpper.connectDB()
     c.execute("SELECT First_Name, Last_Name FROM PLAYERS WHERE Player_ID = ?",(player_id,))
     data = c.fetchall()
     helpper.disconnectDB()
     return(data)
+
 def do_players_subscription_messages():
     league_table = make_liiga_league_table_order()
     c = helpper.connectDB()
@@ -258,17 +269,21 @@ def player_history_table(player: Player_Data):
     history_table += '\n</table>'
     return history_table
 
-def make_admin_messages(c):
+def make_admin_messages():
+    c = helpper.connectDB()
     c.execute("SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE")
     day = c.fetchone()[0]
-    for x in make_admin_list(c):
-        for game_id in x[1]:
-            gName = get_game_name(int(game_id),c)
-            h1 = '<h3>'+gName+' RUNKOSARJA '+str(day)+'</h3>'
-            table1 = ''
-            gTable = make_game_table_order(gName,c)
-            for y in gTable:
-                table1 +='\n<tr>\n<td>'+str(y[0])+'.</td>\n<td>'+y[2]+' '+y[3]+'</td>\n<td>'+str(y[1])+'</td>\n<td>'+points_change(gName,y[5],c)+'</td>\n<td>'+place_change(gName,y[5],c)+'</td>\n</tr>'
+    helpper.disconnectDB()
+    admins = make_admin_list()
+    for item in admins:
+        admin: Admin_Contacts = item
+        for game_name in admin.game_names:
+            h1 = '<h3>'+game_name+' RUNKOSARJA '+str(day)+'</h3>'
+            playerTabeleData = ''
+            players_data = players_game_table_data(game_name)
+            for row in players_data:
+                player: Player_Game_Status = row
+                playerTabeleData +='\n<tr>\n<td>'+str(player.position)+'.</td>\n<td>'+player.first_name+' '+player.last_name+'</td>\n<td>'+str(player.points)+'</td>\n<td>'+points_change(player.points_change)+'</td>\n<td>'+place_change(player.position_change)+'</td>\n</tr>'
             message ='''
 <html>
 <body>
@@ -289,15 +304,15 @@ text-align: left;
 <th>PISTEET</th>
 <th>PISTE MUUTOS</th>
 <th>SIJOITUS MUUTOS</th>
-</tr>'''+table1+'''
+</tr>'''+playerTabeleData+'''
 </table>
 <p> </p>
 </font>
 </body>
 </html>
 '''
-            subject = gName+" RUNKOSARJA "+day
-            send_mail(x[0],subject,message)
+            subject = game_name+" RUNKOSARJA "+day
+            send_mail(admin.email,subject,message)
 def send_mail_players_and_admin():
     Consol.Message('PLAYERS MAILS SENDIN')
     try:
