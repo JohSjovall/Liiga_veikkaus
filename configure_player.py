@@ -13,6 +13,7 @@ def create_games_tables():
     for game in gamesList:
         c = helpper.connectDB()
         c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID INTEGER REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name TEXT, Last_Name TEXT, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
+        helpper.connect().commit()
         helpper.disconnectDB()
 
 def update_game_data(day, name, data):
