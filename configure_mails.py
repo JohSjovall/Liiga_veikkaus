@@ -174,7 +174,7 @@ def build_player_data(league_table, playerData):
     return player
 
 def build_player_message(player: Player_Data):
-    player_heder = build_heder(player)
+    player_heder = player_header(player)
     palyer_teams = player.teams
     league_list = sorted(palyer_teams, key=lambda team:team.position)
     guess_list = sorted(palyer_teams, key=lambda team:team.guess)
@@ -204,7 +204,7 @@ text-align: left;
 '''
     return message
 
-def build_heder(player: Player_Data):
+def player_header(player: Player_Data):
     heder = '<p>Hei <b>'+player.player_first_name+'</b></p>'
     share_text = '\n</b> pelissa jaetulla sijalla <b>' if player.player_shared_place else '</b> pelissa sijalla <b>'
     heder += '\n<p>Olet <b>'+player.game_name+share_text+str(player.player_position)+'</b></p>'
