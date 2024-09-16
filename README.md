@@ -1,5 +1,7 @@
 # Liiga Veikkaus
 
+Versio 1.0
+
 Runkosarja pitkäveto laskija.
 
 Ohjelman tarkoituksena on pitää kirjaa Liigan sarjataulukko tapahtumista ja ylläpitää pelaajien pisteitä jokaiselta kierokselta.
