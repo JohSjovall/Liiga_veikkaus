@@ -185,3 +185,28 @@ class Player_history_round:
 class History_Team:
     def __init__(self, points):
         self.points = points
+
+class Admin_Contacts:
+    def __init__(self, admin_id: int, email: str,):
+        self.admin_id: int = admin_id
+        self.email: str = email
+        self.game_names: list = []
+    
+    def add_game_name(self, game_name: str):
+        self.game_names.append(game_name)
+
+class Player_Game_Status:
+    def __init__(self, first_name: str, last_name: str, position: int, shared_place: bool, points: int):
+        self.first_name: str = first_name
+        self.last_name: str = last_name
+        self.points: int = points
+        self.position: int = position
+        self.shared_place: bool = shared_place
+        self.position_change: int = 0
+        self.points_change: int = 0
+    
+    def set_position_change(self, old_position: int):
+        self.position_change =  old_position - self.position
+    
+    def set_points_change(self, old_points: int):
+        self.points_change =  self.points - old_points
