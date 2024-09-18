@@ -53,10 +53,10 @@ def download_update_liiga(update):
         json_data = json.loads(data)
         league_table = update_liiga_data(json_data)
     except EnvironmentError:
-        Consol.Message("ERROR! NO CONNECT!")
+        Consol.ErroMessage("ERROR! NO CONNECT!")
         return(False)
     except ValueError:
-        Consol.Message("ERROR! JSON DATA NOT WORKING!")
+        Consol.ErroMessage("ERROR! JSON DATA NOT WORKING!")
         return(False)
     Consol.Message("CHEKING DATA...")
     for x in range(len(league_table)):
@@ -91,7 +91,7 @@ def league_data_updaet(TIME):
             make_liigakerros_data(TIME)
             Consol.Message("NEW DATA LIIGA LEAGUE TABLE DONE")
     except Exception as e:
-        Consol.Message("ERROR UPDATE LIIGA LEAGUE TABLE: "+str(e))
+        Consol.ErroMessage("ERROR UPDATE LIIGA LEAGUE TABLE: "+str(e))
 
 def update_liiga_data(data):
     global league_table

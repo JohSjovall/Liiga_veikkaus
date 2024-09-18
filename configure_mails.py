@@ -31,9 +31,8 @@ def send_mail(to, subject, html):
         server.login(me, setup)
         server.sendmail(me, to, msg.as_string())
         server.quit
-        Consol.Message('EMAIL TO: '+to+' SUCCEED')
     except:
-        Consol.Message('EMAIL TO: '+to+' FAILL')
+        Consol.ErroMessage('EMAIL TO: '+to+' FAILL')
 def make_liiga_league_table_order():
     c = helpper.connectDB()
     order = []
@@ -317,10 +316,12 @@ def send_mail_players_and_admin():
     Consol.Message('PLAYERS MAILS SENDIN')
     try:
         do_players_subscription_messages()
+        Consol.Message('COMPLITED')
     except:
-        Consol.Message('ERROR: PLAYERS MAILS SENDIN FAILL')
+        Consol.ErroMessage('ERROR: PLAYERS MAILS SENDIN FAILL')
     Consol.Message('ADMIN MAILS SENDIN')
     try:
         make_admin_messages()
+        Consol.Message('COMPLITED')
     except:
-        Consol.Message('ERROR: ADMINS MAILS SENDIN FAILL')
+        Consol.ErroMessage('ERROR: ADMINS MAILS SENDIN FAILL')

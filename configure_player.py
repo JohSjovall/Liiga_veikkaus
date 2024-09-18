@@ -59,7 +59,7 @@ def make_players_points(): #piste systemi eroteltava omiin metodeihin
                 helpper.disconnectDB()
                 Consol.Message("NEW POINTS DATA DONE PALYER "+str(player_points.get_player())+" GAME "+str(player_points.get_game()))
         except:
-            Consol.Message("FAILL POINTS UPDATE PALYER "+str(player_points.get_player())+" GAME "+str(player_points.get_game()))
+            Consol.ErroMessage("FAILL POINTS UPDATE PALYER "+str(player_points.get_player())+" GAME "+str(player_points.get_game()))
 
 def make_game_tabel_data():
     day = datetime.date.today()
@@ -121,7 +121,7 @@ def make_game_tabel_data():
                     make_game_data(day,game[1],player)
                 Consol.Message("GAME "+str(game[1])+" TABEL IS UPDATED")
         except:
-            Consol.Message("GAME "+str(game[1])+" TABEL UPDATED FAILL")
+            Consol.ErroMessage("GAME "+str(game[1])+" TABEL UPDATED FAILL")
             pass
 def make_updates():
     make_players_points()
@@ -129,3 +129,5 @@ def make_updates():
 
 helpper.make_player_and_team_tabels()
 create_games_tables()
+#make_players_points()
+#make_game_tabel_data()
