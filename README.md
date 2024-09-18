@@ -351,3 +351,12 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 </font>
 </body>
 </html>
+
+
+## Kehitys ympäsristö
+
+Vaatimukset:
+- Python 3.12
+
+asenna riippuvuudet komennolla
+<code>pip3 install -r requirements.txt</code>
