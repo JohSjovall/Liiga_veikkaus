@@ -358,5 +358,5 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 Vaatimukset:
 - Python 3.12
 
-asenna riippuvuudet komennolla
+Asenna riippuvuudet komennolla:\n
 <code>pip3 install -r requirements.txt</code>
