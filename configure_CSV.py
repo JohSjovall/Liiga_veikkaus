@@ -2,6 +2,7 @@ import csv
 import sqlite3
 import configure_player as con_player
 import Consol
+from configure import DB
 
 
 def csv_read_test(dokument_name):
@@ -36,7 +37,7 @@ def csv_read_test(dokument_name):
             read_csv_dokument(dokument_name)
             pass
 def read_csv_dokument(dokument_name):
-    conn = sqlite3.connect('Database_liiga_game.db')
+    conn = sqlite3.connect(DB)
     c = conn.cursor()
     c.execute("SELECT Game_Name FROM GAMES WHERE Game_Name = ?", [str(dokument_name.upper())])
     IsNone = c.fetchone() == None

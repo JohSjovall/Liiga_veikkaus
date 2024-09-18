@@ -1,9 +1,9 @@
 import sqlite3
 import Consol
 import time
+import helpper
 
-conn = sqlite3.connect('Database_liiga_game.db')
-c = conn.cursor()
+c = helpper.connectDB()
 
 def games_name():
     c.execute("SELECT Game_ID, Game_Name FROM GAMES")
@@ -79,6 +79,6 @@ while on:
     if inputs.upper() == 'D':
         delete_admin()
     if inputs.upper() == 'Q':
-        conn.close()
+        helpper.disconnectDB()
 
         on = False
