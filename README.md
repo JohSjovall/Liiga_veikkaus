@@ -353,7 +353,7 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 </html>
 
 
-## Kehitys ympäsristö
+## Kehitysympäsristö
 
 Vaatimukset:
 - Python 3.12
