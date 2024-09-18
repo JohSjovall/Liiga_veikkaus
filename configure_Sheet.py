@@ -38,8 +38,9 @@ def Sheet_Run_List():
 
 def Sheet_Update(sheetData: SheetGame):
     gameName = getGameName(sheetData)
-    service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
-    gc = gspread.authorize(service)
+
+    credentials = Credentials.from_service_account_file(configure.CONNECT,scopes=configure.SCOPE)
+    gc = gspread.authorize(credentials)
     Consol.Message('SHEET STATUS '+gameName+': START')
     try:
         wks = gc.open(sheetData.staus).sheet1
@@ -69,8 +70,8 @@ def getGameName(sheetData: SheetGame):
 
 def Sheet_Player_History(sheetData: SheetGame):
     gameName = getGameName(sheetData)
-    service = ServiceAccountCredentials.from_json_keyfile_name(configure.CONNECT, configure.SCOPE)
-    gc = gspread.authorize(service)
+    credentials = Credentials.from_service_account_file(configure.CONNECT,scopes=configure.SCOPE)
+    gc = gspread.authorize(credentials)
     Consol.Message('START SHEET HISTORY '+gameName+': START')
     try:
         wks = gc.open(sheetData.history).sheet1
