@@ -1,6 +1,6 @@
 # Liiga Veikkaus
 
-Versio 1.0
+Versio 0.2.0
 
 Runkosarja pitkäveto laskija.
 
