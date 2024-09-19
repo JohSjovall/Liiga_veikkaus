@@ -1,96 +1,86 @@
 import datetime
 import sqlite3
 import Consol
+import helpper
+from player_data import Player_Points
+from configure import TEAMS_LIST_STRING as team_list
 
-team_list = "HPK, HIFK, ILVES, JUKURIT, JYP, KALPA, KOOKOO, KARPAT, LUKKO, PELICANS, SAIPA, SPORT, TAPPARA, TPS, ASSAT"
-
-def create_tables(c):
-    c.execute("CREATE TABLE IF NOT EXISTS PLAYERS(Player_ID INTEGER PRIMARY KEY, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Mail TEXT)")
-    c.execute("CREATE TABLE IF NOT EXISTS GAMES(Game_ID INTEGER PRIMARY KEY, Game_Name TEXT NOT NULL UNIQUE)")
-    c.execute("CREATE TABLE IF NOT EXISTS SHEET(Game_ID REFERENCES GAMES(Game_ID) ON UPDATE CASCADE ON DELETE CASCADE, Game_staus TEXT NOT NULL UNIQUE , Game_history TEXT NOT NULL UNIQUE, List_Order INTEGER DEFAULT 1 NOT NULL CHECK (List_Order IN (0, 1)), CONSTRAINT GameSheet_PK PRIMARY KEY(Game_ID, Game_staus, Game_history))")
-    c.execute("CREATE TABLE IF NOT EXISTS PLAYERS_GUESSES(Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, Game_ID REFERENCES GAMES(Game_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, CONSTRAINT PlayerGame_PK PRIMARY KEY(Player_ID, Game_ID))")
-    c.execute("CREATE TABLE IF NOT EXISTS PLAYERS_POINTS(Day_ID DATE NOT NULL, Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE , Game_ID REFERENCES GAMES(Game_ID) ON UPDATE CASCADE ON DELETE CASCADE, HPK INT NOT NULL, HIFK INT NOT NULL, ILVES INT NOT NULL, JUKURIT INT NOT NULL, JYP INT NOT NULL, KALPA INT NOT NULL, KOOKOO INT NOT NULL, KARPAT INT NOT NULL, LUKKO INT NOT NULL, PELICANS INT NOT NULL, SAIPA INT NOT NULL, SPORT INT NOT NULL, TAPPARA INT NOT NULL, TPS INT NOT NULL, ASSAT INT NOT NULL, Six_Correct_Point INT, Points INT, CONSTRAINT DayPlayerGame_PK PRIMARY KEY(Day_ID, Player_ID, Game_ID))")
-    c.execute("CREATE TABLE IF NOT EXISTS ADMINS(Admin_ID INTEGER PRIMARY KEY, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Mail TEXT NOT NULL, Games_ID TEXT)")
-def create_games_tables(c):
+def create_games_tables():
+    c = helpper.connectDB()
     c.execute("SELECT Game_Name FROM GAMES")
     gamesList = c.fetchall()
+    helpper.disconnectDB()
     for game in gamesList:
-        c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name, Last_Name, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
+        c = helpper.connectDB()
+        c.execute("CREATE TABLE IF NOT EXISTS "+game[0]+" (Day_ID DATE, Place INT, Shared_Place INT, Player_ID INTEGER REFERENCES PLAYERS(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE, First_Name TEXT, Last_Name TEXT, Points INT, CONSTRAINT DayPlayer_PK PRIMARY KEY(Day_ID, Player_ID))")
+        helpper.connect().commit()
+        helpper.disconnectDB()
 
-def update_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
+def update_game_data(day, name, data):
+    c = helpper.connectDB() #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name
     c.execute("UPDATE "+str(name)+" SET Day_ID = ?, Player_ID = ?, First_Name = ?, Last_Name = ?, Points = ?, Place = ?, Shared_Place = ? WHERE Day_ID = ? AND Player_ID = ?", (day,data[1],data[2],data[3],data[4],data[5],data[6],day,data[1]))
-    conn.commit()
+    helpper.connect().commit()
+    helpper.disconnectDB()
 
-def make_game_data(day, name, data,c,conn): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
+def make_game_data(day, name, data): #data = [Place, Player_ID, First_Name, Last_Name, Points] name = game_name day = Day_ID
+    c = helpper.connectDB()
     c.execute("INSERT INTO "+name+" (Day_ID, Player_ID, First_Name, Last_Name, Points, Place, Shared_Place) VALUES (?,?,?,?,?,?,?)",(day,data[1],data[2],data[3],data[4],data[5],data[6]))
-    conn.commit()
+    helpper.connect().commit()
+    helpper.disconnectDB()
 
-def make_players_points(c,conn):
+def make_players_points(): #piste systemi eroteltava omiin metodeihin
     day = datetime.date.today()
+    c = helpper.connectDB()
     c.execute("SELECT "+team_list+" FROM LIIGA_LEAGUE_TABLE WHERE Day_ID = (SELECT MAX(Day_ID) FROM LIIGA_LEAGUE_TABLE)")
     league_table = c.fetchone()
-    c.execute("SELECT "+team_list+", Player_ID, Game_ID FROM PLAYERS_GUESSES")
+    helpper.disconnectDB()
+    c = helpper.connectDB()
+    c.execute("SELECT Player_ID, Game_ID, "+team_list+" FROM PLAYERS_GUESSES")
     players_guesses = c.fetchall()
+    helpper.disconnectDB()
     for player in players_guesses:
-        player_points = []
-        points = 0
-        total_points = 0
-        correct_counter = 0
-        for x in range(15):
-            if player[x] == league_table[x]:
-                total_points += 3
-                points += 3
-                correct_counter += 1
-            if player[x] > league_table[x]:
-                total_points += 3-player[x]+league_table[x]
-                points += 3-player[x]+league_table[x]
-            if player[x] < league_table[x]:
-                total_points += 3-league_table[x]+player[x]
-                points += 3-league_table[x]+player[x]
-            if player[x] <= 6 and league_table[x] <= 6:
-                total_points += 1
-                points += 1
-            if player[x] <= 10 and league_table[x] <= 10:
-                total_points += 1
-                points += 1
-            if (player[x] == 1 and league_table[x] == 1) or (player[x] == 15 and league_table[x] == 15):
-                total_points += 1
-                points += 1
-            player_points.append(points)
-            points = 0
-        if correct_counter >= 6:
-            player_points.append(1)
-            total_points += 1
-        else:
-            player_points.append(0)
-        player_points.append(total_points)
+        player_points = Player_Points(player[0], player[1])
+        player_points.cout_points(player[2:], league_table)
         try:
-            c.execute("SELECT MAX(Day_ID) FROM PLAYERS_POINTS WHERE Player_ID = "+str(player[15])+" AND Game_ID = "+str(player[16]))
+            c = helpper.connectDB()
+            c.execute("SELECT MAX(Day_ID) FROM PLAYERS_POINTS WHERE Player_ID = ? AND Game_ID = ?",(player_points.get_player(), player_points.get_game()))
             maxDay = c.fetchone()
+            helpper.disconnectDB()
             if maxDay is not None and "('"+str(day)+"',)" == str(maxDay):
-                c.execute("UPDATE PLAYERS_POINTS SET HPK = ?, HIFK= ?, ILVES = ?, JUKURIT = ?, JYP = ?, KALPA = ?, KOOKOO = ?, KARPAT = ?, LUKKO = ?, PELICANS = ?, SAIPA = ?, SPORT = ?, TAPPARA = ?, TPS = ?, ASSAT = ?, Six_Correct_Point = ?, Points = ? WHERE Day_ID = ? AND Player_ID = ? AND Game_ID = ?", (player_points[0] , player_points[1] , player_points[2] , player_points[3] , player_points[4] , player_points[5] , player_points[6] , player_points[7] , player_points[8] , player_points[9] , player_points[10] , player_points[11] , player_points[12] , player_points[13] , player_points[14] , player_points[15], player_points[16], day, player[15], player[16]))
-                conn.commit()
-                Consol.Message("UPDATE POINTS DONE PALYER "+str(player[15])+" GAME "+str(player[16]))
+                c = helpper.connectDB()
+                c.execute("UPDATE PLAYERS_POINTS SET HPK = ?, HIFK= ?, ILVES = ?, JUKURIT = ?, JYP = ?, KALPA = ?, KESPOO = ?, KOOKOO = ?, KARPAT = ?, LUKKO = ?, PELICANS = ?, SAIPA = ?, SPORT = ?, TAPPARA = ?, TPS = ?, ASSAT = ?, top4_Correct_Point = ?, Six_Correct_Point = ?, Points = ? WHERE Day_ID = ? AND Player_ID = ? AND Game_ID = ?", (player_points.get_team_points(0), player_points.get_team_points(1), player_points.get_team_points(2), player_points.get_team_points(3), player_points.get_team_points(4), player_points.get_team_points(5), player_points.get_team_points(6), player_points.get_team_points(7), player_points.get_team_points(8), player_points.get_team_points(9), player_points.get_team_points(10), player_points.get_team_points(11), player_points.get_team_points(12), player_points.get_team_points(13), player_points.get_team_points(14), player_points.get_team_points(15), player_points.get_top4_poits(), player_points.get_sex_correct_poits(), player_points.get_total_points(), str(day), player_points.get_player(), player_points.get_game()))
+                helpper.connect().commit()
+                helpper.disconnectDB()
+                Consol.Message("UPDATE POINTS DONE PALYER "+str(player_points.get_player())+" GAME "+str(player_points.get_game()))
             else:
-                c.execute("INSERT INTO PLAYERS_POINTS(Day_ID, Player_ID, Game_ID, "+team_list+", Six_Correct_Point, Points) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (day, player[15], player[16], player_points[0] , player_points[1] , player_points[2] , player_points[3] , player_points[4] , player_points[5] , player_points[6] , player_points[7] , player_points[8] , player_points[9] , player_points[10] , player_points[11] , player_points[12] , player_points[13] , player_points[14] , player_points[15], player_points[16]))
-                conn.commit()
-                Consol.Message("NEW POINTS DATA DONE PALYER "+str(player[15])+" GAME "+str(player[16]))
+                c = helpper.connectDB()
+                c.execute("INSERT INTO PLAYERS_POINTS(Day_ID, Player_ID, Game_ID, "+team_list+", top4_Correct_Point ,Six_Correct_Point, Points) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (day, player_points.get_player(), player_points.get_game(), player_points.get_team_points(0), player_points.get_team_points(1), player_points.get_team_points(2), player_points.get_team_points(3), player_points.get_team_points(4), player_points.get_team_points(5), player_points.get_team_points(6), player_points.get_team_points(7), player_points.get_team_points(8), player_points.get_team_points(9), player_points.get_team_points(10), player_points.get_team_points(11), player_points.get_team_points(12), player_points.get_team_points(13), player_points.get_team_points(14), player_points.get_team_points(15), player_points.get_top4_poits(), player_points.get_sex_correct_poits(), player_points.get_total_points()))
+                helpper.connect().commit()
+                helpper.disconnectDB()
+                Consol.Message("NEW POINTS DATA DONE PALYER "+str(player_points.get_player())+" GAME "+str(player_points.get_game()))
         except:
-            Consol.Message("FAILL POINTS UPDATE PALYER "+str(player[15])+" GAME "+str(player[16]))
+            Consol.ErroMessage("FAILL POINTS UPDATE PALYER "+str(player_points.get_player())+" GAME "+str(player_points.get_game()))
 
-def make_game_tabel_data(c,conn):
+def make_game_tabel_data():
     day = datetime.date.today()
+    c = helpper.connectDB()
     c.execute("SELECT Game_ID, Game_Name FROM GAMES")
-    for game in c.fetchall():
+    data = c.fetchall()
+    helpper.disconnectDB()
+    for game in data:
+        c = helpper.connectDB()
         c.execute("SELECT PLAYERS_POINTS.Day_ID, PLAYERS_POINTS.Player_ID, PLAYERS.First_Name, PLAYERS.Last_Name, PLAYERS_POINTS.Points FROM PLAYERS_POINTS, PLAYERS WHERE PLAYERS_POINTS.Day_ID = (SELECT MAX(Day_ID) FROM PLAYERS_POINTS WHERE Game_ID = "+str(game[0])+") AND PLAYERS_POINTS.Game_ID = "+str(game[0])+" AND PLAYERS_POINTS.Player_ID IS PLAYERS.Player_ID ORDER BY PLAYERS_POINTS.Points DESC")
         playersData = c.fetchall()
+        helpper.disconnectDB()
         place = 1
         placeMember = 1
         try:
             if len(playersData)>=2:
                 pointMember = playersData[1][4]
+                c = helpper.connectDB()
                 c.execute("SELECT MAX(Day_ID) FROM "+str(game[1]))
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
+                helpper.disconnectDB()
                 counter = 0
                 for player in playersData:
                     if player[4] == pointMember:
@@ -111,35 +101,33 @@ def make_game_tabel_data(c,conn):
                         place += 1
                         pointMember = player[4]
                     if maxDay == True:
-                        update_game_data(day,game[1],player,c,conn)
+                        update_game_data(day,game[1],player)
                         Consol.Message("GAME "+str(game[1])+" UPDATE PLAYER "+str(player[1])+" DATA")
                     if maxDay == False:
-                        make_game_data(day,game[1],player,c,conn)
+                        make_game_data(day,game[1],player)
                         Consol.Message("GAME "+str(game[1])+" ADD PLAYER "+str(player[1])+" DATA")
                     counter += 1
                 Consol.Message("GAME "+game[1]+" TABEL IS UPDATED")
             else:
                 playersData[0] += (1,)
                 playersData[0] += (0,)
+                c = helpper.connectDB()
                 c.execute("SELECT MAX(Day_ID) FROM "+str(game[1]))
                 maxDay = str(c.fetchone()) == "('"+str(day)+"',)"
+                helpper.disconnectDB()
                 if maxDay:
-                    update_game_data(day,game[1],player,c,conn)
+                    update_game_data(day,game[1],player)
                 else:
-                    make_game_data(day,game[1],player,c,conn)
+                    make_game_data(day,game[1],player)
                 Consol.Message("GAME "+str(game[1])+" TABEL IS UPDATED")
         except:
-            Consol.Message("GAME "+str(game[1])+" TABEL UPDATED FAILL")
+            Consol.ErroMessage("GAME "+str(game[1])+" TABEL UPDATED FAILL")
             pass
 def make_updates():
-    conn = sqlite3.connect('Database_liiga_game.db')
-    c = conn.cursor()
-    make_players_points(c,conn)
-    make_game_tabel_data(c,conn)
-    conn.close()
+    make_players_points()
+    make_game_tabel_data()
 
-con = sqlite3.connect('Database_liiga_game.db')
-cv = con.cursor()
-create_tables(cv)
-create_games_tables(cv)
-con.close()
+helpper.make_player_and_team_tabels()
+create_games_tables()
+#make_players_points()
+#make_game_tabel_data()
