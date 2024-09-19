@@ -45,8 +45,8 @@ def make_liiga_team_data(day, data):
 #Update teams and league table
 def download_update_liiga(update):
     global league_table
-    update = False
     TIME = datetime.date.today()
+    isUpdate = False
     try:
         response = urllib.request.urlopen(configure.URL)
         data = response.read().decode("utf-8")
@@ -69,9 +69,10 @@ def download_update_liiga(update):
         else:
             make_liiga_team_data(TIME, league_table[x])
             Consol.Message("NEW DATA "+league_table[x][0]+" DONE")
-            update = True
-    if update:
+            isUpdate = True
+    if isUpdate:
         league_data_updaet(TIME)
+        update = True
     Consol.Message("UPDATE DONE")
     league_table.clear()
 
