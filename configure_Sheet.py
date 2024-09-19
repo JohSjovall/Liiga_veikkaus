@@ -24,15 +24,15 @@ def Sheet_Table_List():
     gamesSheetList = []
     c = helpper.connectDB()
     c.execute('SELECT Game_ID, Game_staus, Game_history, List_Order FROM SHEET')
-    helpper.disconnectDB()
     for data in c.fetchall():
         gamesSheetList.append(SheetGame(data[0], data[1], data[2], data[3]))
+    helpper.disconnectDB()
     return gamesSheetList
 
 def Sheet_Run_List():
     gamesSheetList = Sheet_Table_List()
     for sheetData in gamesSheetList:
-        Sheet_Update(sheetData, conn)
+        Sheet_Update(sheetData)
         Sheet_Player_History(sheetData)
 
 
