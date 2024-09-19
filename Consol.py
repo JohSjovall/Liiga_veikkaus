@@ -8,11 +8,19 @@ connConsolStart = sqlite3.connect(DB_CONSOLE)
 consolStart = connConsolStart.cursor()
 consolStart.execute("CREATE TABLE IF NOT EXISTS MESSAGES (Date DATE, Time TEXT, Message TEXT)")
 connConsolStart.close()
-logging.basicConfig(filename='liiga.log',
-                        filemode='a',
-                        level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s: %(message)s',
-                        datefmt='%d/%m/%Y %H:%M:%S')
+
+logger = logging.getLogger('liiga-app')
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(filename='liiga.log', mode='a')
+fh.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s: %(message)s', datefmt='%d/%m/%Y %H:%M:%S' )
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+logger.addHandler(fh)
+logger.addHandler(ch)
+
 
 def MessageToDB(message):
     connConsol = sqlite3.connect(DB_CONSOLE)
@@ -25,8 +33,8 @@ def MessageToDB(message):
 
 def ErroMessage(message):
     MessageToDB(message)
-    logging.error(message)
+    logger.error(message)
 
 def Message(message):
     MessageToDB(message)
-    logging.info(message)
+    logger.info(message)
