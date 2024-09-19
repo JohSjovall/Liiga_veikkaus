@@ -40,12 +40,12 @@ def admins_name():
 def add_admin(First_Name, Last_Name, Mail, Games_ID):
     c.execute("INSERT INTO ADMINS (First_Name, Last_Name, Mail) VALUES (?,?,?)",(First_Name, Last_Name, Mail))
     admin_id = c.lastrowid
-    conn.commit()
+    helpper.connect().commit()
     gameBank = []
     for id in Games_ID:
          gameBank.append((int(admin_id),int(id)))
     c.executemany("INSERT INTO ADMINS_GAMES (Admin_ID, Game_ID) VALUES (?,?)",gameBank)
-    conn.commit()
+    helpper.connect().commit()
 def make_admin():
     First_Name = input('First Name: ')
     Last_Name = input('Last Name: ')
@@ -64,9 +64,9 @@ def delete_admin():
         delete = str(input('DELETE ADMIN NUMBERS: '))
         for admin in delete:
             c.execute("DELETE FROM ADMINS WHERE Admin_ID = ?",(admin,))
-            conn.commit()
+            helpper.connect().commit()
             c.execute("DELETE FROM ADMINS_GAMES WHERE Admin_ID = ?",(admin,))
-            conn.commit()
+            helpper.connect().commit()
     else:
         print('NO ADMINS')
 
@@ -80,5 +80,4 @@ while on:
         delete_admin()
     if inputs.upper() == 'Q':
         helpper.disconnectDB()
-
         on = False
