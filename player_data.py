@@ -72,9 +72,7 @@ class Player_Points:
         if team.get_guess() < 5: # 1-4
             if team.get_position() < 5:
                 points += 1
-            return 0
         elif team.get_guess() < 13:
-            points = 0
             if team.get_position() < 13 and team.get_position() > 4: # 5-12
                 points += 1
                 if team.get_guess() < 9 and team.get_position() < 9: # 5-8
