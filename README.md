@@ -355,12 +355,32 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 </html>
 
 
-## Kehitysympäsristö
+## Kehitysympäristö
 
-Vaatimukset:
-- Python 3.12
+### Vaatimukset:
+- Python 3.11+
 
-Asenna riippuvuudet komennolla:
+### Virtuaaliympäriön asentaminen:
 ```
-pip3 install -r requirements.txt
+mkdir .venv
+python3 -m venv --system-site-packages .venv
+```
+
+### Virtuaali ympäsitön käyttö
+#### käynistäminen 
+```
+source .venv/bin/activate
+```
+#### sammuttamien
+```
+deactivate
+```
+#### tai käyttää kuin normaalia python komentoa
+```
+.venv/bin/python3
+```
+
+### Riipuvuuksien asenus:
+```
+.venv/bin/pip3 install -r requirements.txt
 ```
