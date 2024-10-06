@@ -400,6 +400,8 @@ After=multi-user.target network.target
 [Service]
 ExecStart=<bath to project>/.venv/bin/python3 <bath to project>/run.py
 Restart=always
+RestartSec=10s
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
