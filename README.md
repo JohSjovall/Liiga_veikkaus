@@ -411,3 +411,12 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl enable liiga.service
 ```
+#### statuksen tarkistus
+```
+sudo systemctl status liiga.service
+```
+
+#### login seuraaminen
+```
+tail -f liiga.log
+```
