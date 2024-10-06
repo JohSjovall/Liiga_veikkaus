@@ -384,3 +384,28 @@ deactivate
 ```
 .venv/bin/pip3 install -r requirements.txt
 ```
+
+### systemd
+
+#### luodaan service
+```
+sudo nano /lib/systemd/system/liiga.service
+```
+#### service settings
+```
+[Unit]
+Description=Liiga veikkaus
+After=multi-user.target network.target
+
+[Service]
+ExecStart=<bath to project>/.venv/bin/python3 <bath to project>/run.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+#### asettamisen jälkeen
+```
+sudo systemctl daemon-reload
+sudo systemctl enable liiga.service
+```
