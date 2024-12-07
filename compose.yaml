@@ -1,0 +1,14 @@
+services:
+  liiga:
+    build: ./
+    container_name: liiga
+    volumes:
+      - ./db:/usr/src/app/db
+      - ./log:/usr/src/app/log
+      - ${BACKUP-./backup}:/usr/src/app/backup
+      - ./var:/usr/src/app/var
+    env_file:
+      - path: ./default.env
+        required: true # default
+      - path: ./service.env
+        required: false
