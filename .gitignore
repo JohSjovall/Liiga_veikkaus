@@ -1,8 +1,14 @@
 *.db
-configure.py
 quickstart.py
-*.json
-**/
 *.csv
 .vscode
 *.log
+*.env
+/.*
+.*
+/vali
+/var/*
+/backup
+/__pycache__
+/db/*
+/log/*

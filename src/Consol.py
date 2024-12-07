@@ -2,7 +2,7 @@ import datetime
 import time
 import sqlite3
 import logging
-from configure import DB_CONSOLE
+from configure import DB_CONSOLE, LOGIN_FILE
 
 connConsolStart = sqlite3.connect(DB_CONSOLE)
 consolStart = connConsolStart.cursor()
@@ -11,7 +11,7 @@ connConsolStart.close()
 
 logger = logging.getLogger('liiga-app')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(filename='liiga.log', mode='a')
+fh = logging.FileHandler(filename=LOGIN_FILE+'/liiga.log', mode='a')
 fh.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
