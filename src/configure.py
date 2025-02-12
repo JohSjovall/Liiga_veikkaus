@@ -5,6 +5,7 @@ SETUP = os.getenv("SETUP")
 CONNECT = os.getenv("CONNECT")
 DB_PATH = os.getenv('DB_PATH')
 WORK_PATH = os.getenv("WORK_PATH")
+BACKUP_PATH = os.getenv("BACKUP_PATH")
 print(DB_PATH)
 DB = DB_PATH + os.getenv("DB")
 DB_CONSOLE = DB_PATH +os.getenv("DB_CONSOLE")
@@ -19,7 +20,7 @@ TEAMS = json.load(f)
 
 def SAVE():
     try:
-        os.system("cp "+DB+" "+WORK_PATH+"/backup")
-        os.system("cp "+DB_CONSOLE+" "+WORK_PATH+"/backup")
+        os.system("cp "+DB+" "+BACKUP_PATH)
+        os.system("cp "+DB_CONSOLE+" "+BACKUP_PATH)
     except:
         print('SAVE_FAILL')
