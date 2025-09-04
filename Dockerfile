@@ -1,5 +1,7 @@
 FROM python:3
 
+ENV TZ=Europe/Helsinki
+
 WORKDIR /usr/src/app
 
 COPY requirements.txt requirements.txt
