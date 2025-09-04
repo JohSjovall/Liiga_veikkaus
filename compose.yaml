@@ -12,3 +12,4 @@ services:
         required: true # default
       - path: ./service.env
         required: false
+    restart: unless-stopped
