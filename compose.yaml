@@ -8,8 +8,8 @@ services:
       - ./backup:/usr/src/app/backup
       - ./var:/usr/src/app/var
     env_file:
-      - path: ./default.env
+      - path: .env/default.env
         required: true # default
-      - path: ./service.env
+      - path: .env/service.env
         required: false
     restart: unless-stopped
