@@ -7,6 +7,7 @@ services:
       - ./log:/usr/src/app/log
       - ./backup:/usr/src/app/backup
       - ./var:/usr/src/app/var
+      - ./Game_CSV_files:/usr/src/app/Game_CSV_files
     env_file:
       - path: .env/default.env
         required: true # default

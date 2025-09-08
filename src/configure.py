@@ -6,7 +6,6 @@ CONNECT = os.getenv("CONNECT")
 DB_PATH = os.getenv('DB_PATH')
 WORK_PATH = os.getenv("WORK_PATH")
 BACKUP_PATH = os.getenv("BACKUP_PATH")
-print(DB_PATH)
 DB = DB_PATH + os.getenv("DB")
 DB_CONSOLE = DB_PATH +os.getenv("DB_CONSOLE")
 SCOPE = [os.getenv("SCOPE_APP"), os.getenv("SCOPE_AUTH")]

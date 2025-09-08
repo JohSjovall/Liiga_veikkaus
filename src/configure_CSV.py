@@ -7,7 +7,7 @@ from configure import DB
 
 def csv_read_test(dokument_name):
     print("---------------------------------------------")
-    with open("../Game_CSV_files/"+dokument_name+'.csv', 'r') as file:
+    with open("./Game_CSV_files/"+dokument_name+'.csv', 'r') as file:
         csv_reader_1 = csv.reader(file)
         next(csv_reader_1)
         continue_reder = True
