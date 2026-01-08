@@ -1,5 +1,7 @@
 # Liiga Veikkaus
 
+Versio 0.2.1
+
 Runkosarja pitkäveto laskija.
 
 Ohjelman tarkoituksena on pitää kirjaa Liigan sarjataulukko tapahtumista ja ylläpitää pelaajien pisteitä jokaiselta kierokselta.
@@ -351,3 +353,70 @@ Ohjelma lähettää pelaajille sähköpostin heidän pisteistä jokaiselta kiero
 </font>
 </body>
 </html>
+
+
+## Kehitysympäristö
+
+### Vaatimukset:
+- Python 3.11+
+
+### Virtuaaliympäriön asentaminen:
+```
+mkdir .venv
+python3 -m venv --system-site-packages .venv
+```
+
+### Virtuaali ympäsitön käyttö
+#### käynistäminen 
+```
+source .venv/bin/activate
+```
+#### sammuttamien
+```
+deactivate
+```
+#### tai käyttää kuin normaalia python komentoa
+```
+.venv/bin/python3
+```
+
+### Riipuvuuksien asenus:
+```
+.venv/bin/pip3 install -r requirements.txt
+```
+
+### systemd
+
+#### luodaan service
+```
+sudo nano /lib/systemd/system/liiga.service
+```
+#### service settings
+```
+[Unit]
+Description=Liiga veikkaus
+After=multi-user.target network.target
+
+[Service]
+ExecStart=<bath to project>/.venv/bin/python3 <bath to project>/run.py
+Restart=always
+RestartSec=10s
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+```
+#### asettamisen jälkeen
+```
+sudo systemctl daemon-reload
+sudo systemctl enable liiga.service
+```
+#### statuksen tarkistus
+```
+sudo systemctl status liiga.service
+```
+
+#### login seuraaminen
+```
+tail -f liiga.log
+```

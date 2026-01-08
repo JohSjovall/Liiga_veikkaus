@@ -11,12 +11,15 @@ update = False
 sendMessage = False
 Consol.Message("SERVER RUN ONE TIME")
 try:
+        #Sheet.Sheet_Run_List()
         history = game.download_update_liiga(False)
         player.make_updates()
-        mail.send_mail_players_and_admin()
-        #if history == True:
-        Sheet.Sheet_Player_History()
-        Consol.Message("SERVER ONE TIME RUN DONE")
+        history = True
+        if history == True:
+               player.make_updates()
+               mail.send_mail_players_and_admin()
+        #      Sheet.Sheet_Run_List()
+               Consol.Message("SERVER ONE TIME RUN DONE")
         configure.SAVE()
 except Exception as e:
         print('Fail')

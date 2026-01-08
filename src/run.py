@@ -31,4 +31,4 @@ try:
             configure.SAVE()
             time.sleep(3600)
 except Exception as e:
-    Consol.Message("SERVER FAILL: "+str(e))
+    Consol.ErroMessage("SERVER FAILL: "+str(e))
