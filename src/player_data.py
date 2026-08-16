@@ -66,7 +66,7 @@ class Player_Points:
 
     def get_location_poits(self, team: Team):
         points = 0
-        if (team.get_guess() == 1 or team.get_guess() == 16) and team.isCorrect(): # 1 or 16
+        if (team.get_guess() == 1 or team.get_guess() == 17) and team.isCorrect(): # 1 or 17
             points += 1
         if team.get_guess() < 5 and team.get_position() < 5: # 1-4
             points += 1 
