@@ -15,7 +15,7 @@ def csv_read_test(dokument_name):
             teamList=[]
             miss = False
             tooMuch = []
-            missTemas = ["HPK", "HIFK", "ILVES", "JUKURIT", "JYP", "KALPA", "KIEKKO-ESPOO", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
+            missTemas = ["HPK", "HIFK", "ILVES", "JOKERIT", "JUKURIT", "JYP", "KALPA", "KIEKKO-ESPOO", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
             for x in range(5,21):
                 if line[x] in teamList:
                     tooMuch.append(line[x])
