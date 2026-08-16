@@ -62,7 +62,7 @@ class Player_Points:
             self.six_correct += 1
     
     def get_position_poits(self, team: Team):
-            return 4 - abs(team.get_guess() - team.get_position())
+            return 5 - abs(team.get_guess() - team.get_position())
 
     def get_location_poits(self, team: Team):
         points = 0
