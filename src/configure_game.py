@@ -97,9 +97,9 @@ def league_data_updaet(TIME):
 def update_liiga_data(data):
     global league_table
     teams = configure.TEAMS
-    temp_league_table = [[]] * 16
+    temp_league_table = [[]] * 17
     season = data['season']
-    for i in range(0,16):
+    for i in range(0,17):
         team = season[i]
         temp_league_table[i] = [teams[str(team['teamId'])]] #Team name
         temp_league_table[i].append(int(team['games'])) #Games_Played
