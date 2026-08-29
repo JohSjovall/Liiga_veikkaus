@@ -33,6 +33,7 @@ def send_mail(to, subject, html):
         server.quit
     except:
         Consol.ErroMessage('EMAIL TO: '+to+' FAILL')
+
 def make_liiga_league_table_order():
     c = helpper.connectDB()
     order = []
@@ -45,12 +46,6 @@ def make_liiga_league_table_order():
     except:
         helpper.disconnectDB()
         return None
-def make_players_list():
-    c = helpper.connectDB()
-    c.execute("SELECT PLAYERS_GUESSES.Player_ID, PLAYERS_GUESSES.Game_ID, PLAYERS.Mail FROM PLAYERS_GUESSES, PLAYERS WHERE PLAYERS_GUESSES.Player_ID = PLAYERS.Player_ID AND Mail IS NOT NULL")
-    data = c.fetchall()
-    c.close()
-    return data
 
 def make_admin_list():
     admin_data = []
@@ -69,42 +64,27 @@ def make_admin_list():
         admin_data.append(admin)
     return admin_data
 
-def make_players_guesses_table_order(PlayerGame):
-    c = helpper.connectDB()
-    order = ["" for _ in range(len(team_list)+3)]
-    counter = 0
-    c.execute("SELECT "+teams_list+", top4_Correct_Point ,Six_Correct_Point, Points FROM PLAYERS_POINTS WHERE Player_ID = ? AND Game_ID = ? AND Day_ID = (SELECT MAX(Day_ID) FROM PLAYERS_POINTS)",(PlayerGame[0],PlayerGame[1]))
-    points = c.fetchone()
-    try:
-        c.execute("SELECT "+teams_list+" FROM PLAYERS_GUESSES WHERE Player_ID = ? AND Game_ID = ?",(PlayerGame[0],PlayerGame[1]))
-        for team in c.fetchone():
-            order[team-1] = (team_list[counter],points[counter])
-            counter += 1
-        order[15] = ("Six_Correct_Point",points[15])
-        order[16] = ("Points",points[16])
-        helpper.disconnectDB()
-        return order
-    except:
-        helpper.disconnectDB()
-        return None
 def get_player_guesses_list(PlayerId, GameId):
     c = helpper.connectDB()
     c.execute("SELECT "+teams_list+" FROM PLAYERS_GUESSES WHERE Player_ID = ? AND Game_ID = ?",(PlayerId, GameId))
     data = c.fetchone()
     helpper.disconnectDB()
     return data
+
 def get_player_guesses_points(PlayerId, GameId):
     c = helpper.connectDB()
     c.execute("SELECT Points, Six_Correct_Point, top4_Correct_Point, "+teams_list+" FROM PLAYERS_POINTS WHERE Player_ID = ? AND Game_ID = ? AND Day_ID = (SELECT MAX(Day_ID) FROM PLAYERS_POINTS)",(PlayerId, GameId))
     data = c.fetchone()
     helpper.disconnectDB()
     return data
+
 def make_Player_statistics(player_id, game_id):
     c = helpper.connectDB()
     c.execute("SELECT Day_ID, Points, Six_Correct_Point, top4_Correct_Point, "+teams_list+" FROM PLAYERS_POINTS WHERE Player_ID = ? AND Game_ID = ? ORDER BY Day_ID DESC",(player_id, game_id))
     data = c.fetchall()
     helpper.disconnectDB()
     return(data)
+
 def players_game_table_data(game_name):
     players_list = []
     c = helpper.connectDB()
@@ -312,6 +292,7 @@ text-align: left;
 '''
             subject = game_name+" RUNKOSARJA "+day
             send_mail(admin.email,subject,message)
+
 def send_mail_players_and_admin():
     Consol.Message('PLAYERS MAILS SENDIN')
     try:

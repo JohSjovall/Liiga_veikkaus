@@ -18,7 +18,7 @@ def make_liigakerros_data(day):
     for x in range(len(league_table)):
         data = data+", "+league_table[x][0]
     c = helpper.connectDB()
-    c.execute("INSERT INTO LIIGA_LEAGUE_TABLE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16))
+    c.execute("INSERT INTO LIIGA_LEAGUE_TABLE ("+data+") VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(day ,1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16, 17))
     helpper.connect().commit()
     helpper.disconnectDB()
 def update_liigakierros_data(day):
@@ -31,7 +31,7 @@ def update_liigakierros_data(day):
         else:
             pass
     c = helpper.connectDB()
-    c.execute("UPDATE LIIGA_LEAGUE_TABLE SET "+data+" WHERE Day_ID = ?",(1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16 ,day))
+    c.execute("UPDATE LIIGA_LEAGUE_TABLE SET "+data+" WHERE Day_ID = ?",(1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10 ,11 ,12 ,13 ,14 ,15, 16 , 17, day))
     helpper.connect().commit()
     helpper.disconnectDB()
 #Liiga joukkue
@@ -97,9 +97,9 @@ def league_data_updaet(TIME):
 def update_liiga_data(data):
     global league_table
     teams = configure.TEAMS
-    temp_league_table = [[]] * 16
+    temp_league_table = [[]] * 17
     season = data['season']
-    for i in range(0,16):
+    for i in range(0,17):
         team = season[i]
         temp_league_table[i] = [teams[str(team['teamId'])]] #Team name
         temp_league_table[i].append(int(team['games'])) #Games_Played

@@ -9,6 +9,6 @@ quickstart.py
 /vali
 /var/*
 /backup
-/__pycache__
+__pycache__
 /db/*
 /log/*
