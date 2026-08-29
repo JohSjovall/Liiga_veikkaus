@@ -16,7 +16,7 @@ def csv_read_test(dokument_name):
             miss = False
             tooMuch = []
             missTemas = ["HPK", "HIFK", "ILVES", "JOKERIT", "JUKURIT", "JYP", "KALPA", "KIEKKO-ESPOO", "KOOKOO", "KARPAT", "LUKKO", "PELICANS", "SAIPA", "SPORT", "TAPPARA", "TPS", "ASSAT"]
-            for x in range(5,21):
+            for x in range(5,22):
                 if line[x] in teamList:
                     tooMuch.append(line[x])
                     miss = True
@@ -64,7 +64,7 @@ def read_csv_dokument(dokument_name):
                     mail=line[1]
                 else:
                     mail=None
-                for x in range(5,21):
+                for x in range(5,22):
                     #fix team naming
                     if line[x] == "KIEKKO-ESPOO":
                         guesses += ",KESPOO"
